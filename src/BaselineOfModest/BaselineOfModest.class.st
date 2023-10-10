@@ -19,7 +19,8 @@ BaselineOfModest >> dependencies: spec [
 	spec
 		baseline: 'FamixOpenTelemetry' with: [ "loads Famix-Value"
 			spec
-				repository: 'github://moostechnology/Famix-OpenTelemetry:main/src';
+				repository:
+					'github://moosetechnology/Famix-OpenTelemetry:main/src';
 				loads: 'all' ];
 		baseline: 'FamixUnitTest'
 		with: [ 
