@@ -10,5 +10,6 @@ This model is then exported into ASTs, usually using the [FAST](https://github.c
 Metacello new
   githubUser: 'Gabriel-Darbord' project: 'Modest' commitish: 'main' path: 'src';
   baseline: 'Modest';
+  onConflictUseIncoming;
   load
 ```
