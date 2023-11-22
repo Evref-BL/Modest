@@ -65,6 +65,12 @@ ModestTestGenerator >> famixModel: aFamixModel [
 	famixModel := aFamixModel
 ]
 
+{ #category : #accessing }
+ModestTestGenerator >> formattersDirectory [
+
+	^ self localDirectory , 'formatters/'
+]
+
 { #category : #importing }
 ModestTestGenerator >> importTraces [
 
