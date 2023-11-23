@@ -39,7 +39,6 @@ ModestTestGenerator class >> runLocal [
 
 { #category : #accessing }
 ModestTestGenerator >> beLocal [
-
 	"Whether to get traces locally, otherwise fetch them from a remote server."
 
 	isLocal := true
@@ -47,7 +46,6 @@ ModestTestGenerator >> beLocal [
 
 { #category : #running }
 ModestTestGenerator >> exportUnitTests [
-
 	"Define how the unit test AST model is exported into actual tests integrated into the tested application."
 
 	self subclassResponsibility
@@ -105,7 +103,6 @@ ModestTestGenerator >> localDirectory: aPathString [
 
 { #category : #transforming }
 ModestTestGenerator >> makeUnitTests [
-
 	"Define how to construct the test model from the traces and values."
 
 	self subclassResponsibility
@@ -113,7 +110,6 @@ ModestTestGenerator >> makeUnitTests [
 
 { #category : #'instance creation' }
 ModestTestGenerator >> newASTRefactorer [
-
 	"Answer an object capable of doing AST refactorings, such as a subclass of FASTRefactor."
 
 	self subclassResponsibility
@@ -121,7 +117,6 @@ ModestTestGenerator >> newASTRefactorer [
 
 { #category : #'instance creation' }
 ModestTestGenerator >> newEntityFinder [
-
 	"Answer an object capable of finding application model elements.
 	It should be a FamixEntityFinder or a subclass."
 
@@ -130,7 +125,6 @@ ModestTestGenerator >> newEntityFinder [
 
 { #category : #'instance creation' }
 ModestTestGenerator >> newLocalTraceExtractor [
-
 	"Answer an object capable of extracting traces from a local source.
 	It should be a subclass of OTelAbstractExtractor, such as OTelJSONFileExtractor."
 
@@ -139,7 +133,6 @@ ModestTestGenerator >> newLocalTraceExtractor [
 
 { #category : #'instance creation' }
 ModestTestGenerator >> newRemoteTraceExtractor [
-
 	"Answer an object capable of extracting traces from a remote source.
 	It should be a subclass of OTelAbstractExtractor, such as OTelZipkinExtractor."
 
@@ -151,7 +144,7 @@ ModestTestGenerator >> newTraceExtractor [
 
 	^ isLocal
 		  ifTrue: [ self newLocalTraceExtractor ]
-		  ifFalse: [ 
+		  ifFalse: [
 		  self newRemoteTraceExtractor outputFilename: self newTraceFilename ]
 ]
 
@@ -165,7 +158,6 @@ ModestTestGenerator >> newTraceFilename [
 
 { #category : #'instance creation' }
 ModestTestGenerator >> newTraceLoader [
-
 	"Answer an object capable of loading trace entities from raw trace data.
 	It should be a subclass of OTelAbstractLoader, such as OTelZipkinLoader."
 
@@ -174,7 +166,6 @@ ModestTestGenerator >> newTraceLoader [
 
 { #category : #'instance creation' }
 ModestTestGenerator >> newTraceTransformers [
-
 	"Answer a collection of objects capable of transforming trace entities.
 	They should be a subclass of OTelAbstractTransformer, such as OTelSpanTransformer.
 	Most importantly, it one of these transformers must be an instance of OTelFamixValueLinker."

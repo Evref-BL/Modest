@@ -8,7 +8,7 @@ Class {
 BaselineOfModest >> baseline: spec [
 
 	<baseline>
-	spec for: #common do: [ 
+	spec for: #common do: [
 		self dependencies: spec.
 		self packages: spec ]
 ]
@@ -23,10 +23,10 @@ BaselineOfModest >> dependencies: spec [
 					'github://moosetechnology/Famix-OpenTelemetry:main/src';
 				loads: 'all' ];
 		baseline: 'FamixUnitTest'
-		with: [ 
+		with: [
 		spec repository: 'github://moosetechnology/Famix-UnitTest:main/src' ];
 		baseline: 'FASTRefactor'
-		with: [ 
+		with: [
 		spec repository: 'github://moosetechnology/FASTRefactor:main/src' ]
 ]
 

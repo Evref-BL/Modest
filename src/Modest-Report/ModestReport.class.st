@@ -24,7 +24,6 @@ ModestReport class >> about: aTestGenerator [
 
 { #category : #streaming }
 ModestReport >> <- aString [
-
 	"add a new list element with the given value"
 
 	self indent.
@@ -36,7 +35,6 @@ ModestReport >> <- aString [
 
 { #category : #streaming }
 ModestReport >> <-@ aKeyString [
-
 	"add a new dictionary in the current list, starting with the given key"
 
 	self indent.
@@ -49,7 +47,6 @@ ModestReport >> <-@ aKeyString [
 
 { #category : #streaming }
 ModestReport >> <=- aString [
-
 	"add a list element in the parent dictionary with the given value"
 
 	self indentMinus <- aString
@@ -57,7 +54,6 @@ ModestReport >> <=- aString [
 
 { #category : #streaming }
 ModestReport >> <=@ aKeyString [
-
 	"start an entry in the parent dictionary with the given key"
 
 	self indentMinus <@ aKeyString
@@ -65,7 +61,6 @@ ModestReport >> <=@ aKeyString [
 
 { #category : #streaming }
 ModestReport >> <@ aKeyString [
-
 	"start an entry in the current dictionary with the given key"
 
 	self indent.
@@ -76,7 +71,6 @@ ModestReport >> <@ aKeyString [
 
 { #category : #streaming }
 ModestReport >> => aValue [
-
 	"set a unique dictionary value at the previously defined key"
 
 	stream nextPut: Character space.
@@ -86,7 +80,6 @@ ModestReport >> => aValue [
 
 { #category : #streaming }
 ModestReport >> =>- aString [
-
 	"start a new child list with the given element"
 
 	stream nextPut: Character lf.
@@ -95,7 +88,6 @@ ModestReport >> =>- aString [
 
 { #category : #streaming }
 ModestReport >> =>@ aKeyString [
-
 	"start a new child dictionary with the given key"
 
 	stream nextPut: Character lf.
@@ -190,12 +182,11 @@ ModestReport >> writeAbout: actor [
 
 { #category : #writing }
 ModestReport >> writeList: aCollection [
-
 	"make a list with the given reportable elements"
 
 	| listIndent |
 	listIndent := indent.
-	aCollection do: [ :each | 
+	aCollection do: [ :each |
 		self <-@ 'class' => each className.
 		each reportOn: self.
 		indent := listIndent ]
@@ -236,6 +227,6 @@ ModestReport >> writeToFile [
 	 /
 		 ((start truncated asString replaceAll: $: with: $_)
 		  , '-ModestReport-' , testGenerator famixModel name , '.yaml'))
-		ensureCreateFile writeStreamDo: [ :fileStream | 
+		ensureCreateFile writeStreamDo: [ :fileStream |
 		fileStream nextPutAll: stream contents ]
 ]

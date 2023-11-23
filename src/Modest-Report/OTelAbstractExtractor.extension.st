@@ -3,6 +3,6 @@ Extension { #name : #OTelAbstractExtractor }
 { #category : #'*Modest-Report' }
 OTelAbstractExtractor >> reportOn: report [
 
-	outputFilename ifNotNil: [ 
+	outputFilename ifNotNil: [
 		report <@ 'outputFilename' => outputFilename ]
 ]
