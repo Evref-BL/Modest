@@ -44,7 +44,7 @@ ModestTestGenerator >> beLocal [
 	isLocal := true
 ]
 
-{ #category : #running }
+{ #category : #transforming }
 ModestTestGenerator >> exportUnitTests [
 	"Define how the unit test AST model is exported into actual tests integrated into the tested application."
 
@@ -124,28 +124,12 @@ ModestTestGenerator >> newEntityFinder [
 ]
 
 { #category : #'instance creation' }
-ModestTestGenerator >> newLocalTraceExtractor [
-	"Answer an object capable of extracting traces from a local source.
-	It should be a subclass of OTelAbstractExtractor, such as OTelJSONFileExtractor."
-
-	self subclassResponsibility
-]
-
-{ #category : #'instance creation' }
-ModestTestGenerator >> newRemoteTraceExtractor [
-	"Answer an object capable of extracting traces from a remote source.
-	It should be a subclass of OTelAbstractExtractor, such as OTelZipkinExtractor."
-
-	self subclassResponsibility
-]
-
-{ #category : #'instance creation' }
 ModestTestGenerator >> newTraceExtractor [
 
 	^ isLocal
-		  ifTrue: [ self newLocalTraceExtractor ]
+		  ifTrue: [ self newTraceLocalExtractor ]
 		  ifFalse: [
-		  self newRemoteTraceExtractor outputFilename: self newTraceFilename ]
+		  self newTraceRemoteExtractor outputFilename: self newTraceFilename ]
 ]
 
 { #category : #'instance creation' }
@@ -160,6 +144,22 @@ ModestTestGenerator >> newTraceFilename [
 ModestTestGenerator >> newTraceLoader [
 	"Answer an object capable of loading trace entities from raw trace data.
 	It should be a subclass of OTelAbstractLoader, such as OTelZipkinLoader."
+
+	self subclassResponsibility
+]
+
+{ #category : #'instance creation' }
+ModestTestGenerator >> newTraceLocalExtractor [
+	"Answer an object capable of extracting traces from a local source.
+	It should be a subclass of OTelAbstractExtractor, such as OTelJSONFileExtractor."
+
+	self subclassResponsibility
+]
+
+{ #category : #'instance creation' }
+ModestTestGenerator >> newTraceRemoteExtractor [
+	"Answer an object capable of extracting traces from a remote source.
+	It should be a subclass of OTelAbstractExtractor, such as OTelZipkinExtractor."
 
 	self subclassResponsibility
 ]
