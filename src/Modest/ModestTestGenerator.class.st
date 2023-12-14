@@ -17,11 +17,16 @@ Class {
 		'testASTModel',
 		'entityFinder',
 		'isLocal',
-		'localDirectory',
-		'report'
+		'localDirectory'
 	],
 	#category : #Modest
 }
+
+{ #category : #testing }
+ModestTestGenerator class >> isAbstract [
+
+	^ self == ModestTestGenerator
+]
 
 { #category : #running }
 ModestTestGenerator class >> run [
@@ -44,9 +49,28 @@ ModestTestGenerator >> beLocal [
 	isLocal := true
 ]
 
-{ #category : #transforming }
-ModestTestGenerator >> exportUnitTests [
+{ #category : #running }
+ModestTestGenerator >> buildUnitTests [
+	"Define how to construct the test model from the traces and values."
+
+	testModel := FamixUTImporter new fromOpenTelemetrySpans:
+		             traceModel allSpans.
+
+	"Make a suite with all generated test cases"
+	(testModel newSuiteNamed: 'ModestSuite') cases:
+		(testModel allWithType: FamixUTCase)
+]
+
+{ #category : #running }
+ModestTestGenerator >> exportAST [
 	"Define how the unit test AST model is exported into actual tests integrated into the tested application."
+
+	self subclassResponsibility
+]
+
+{ #category : #running }
+ModestTestGenerator >> exportUnitTests [
+	"Export the unit test model to AST."
 
 	self subclassResponsibility
 ]
@@ -64,29 +88,49 @@ ModestTestGenerator >> famixModel: aFamixModel [
 ]
 
 { #category : #accessing }
+ModestTestGenerator >> famixModelName [
+
+	self subclassResponsibility
+]
+
+{ #category : #accessing }
 ModestTestGenerator >> formattersDirectory [
 
 	^ self localDirectory , 'formatters/'
 ]
 
-{ #category : #importing }
+{ #category : #running }
+ModestTestGenerator >> getCodebaseModel [
+	"Assume the model is already loaded in the image."
+
+	famixModel := MooseModel root detect: [ :model |
+		              model name = self famixModelName ].
+	entityFinder := self newEntityFinder model: famixModel
+]
+
+{ #category : #running }
+ModestTestGenerator >> importTraceValues [
+	"Extract the values from the traces."
+
+	self newTraceValueLinker value: traceModel
+]
+
+{ #category : #running }
 ModestTestGenerator >> importTraces [
+	"Import the application traces into a model."
 
 	traceModel := FamixOTelValueModel new.
 	OpenTelemetryImporter new
 		extractor: self newTraceExtractor;
 		loader: (self newTraceLoader model: traceModel);
 		transformers: self newTraceTransformers;
-		import;
-		reportOn: report
+		import
 ]
 
 { #category : #initialization }
 ModestTestGenerator >> initialize [
 
-	entityFinder := self newEntityFinder model: self famixModel.
-	isLocal := false.
-	report := ModestReport about: self
+	isLocal := false
 ]
 
 { #category : #accessing }
@@ -99,13 +143,6 @@ ModestTestGenerator >> localDirectory [
 ModestTestGenerator >> localDirectory: aPathString [
 
 	localDirectory := aPathString
-]
-
-{ #category : #transforming }
-ModestTestGenerator >> makeUnitTests [
-	"Define how to construct the test model from the traces and values."
-
-	self subclassResponsibility
 ]
 
 { #category : #'instance creation' }
@@ -167,13 +204,19 @@ ModestTestGenerator >> newTraceRemoteExtractor [
 { #category : #'instance creation' }
 ModestTestGenerator >> newTraceTransformers [
 	"Answer a collection of objects capable of transforming trace entities.
-	They should be a subclass of OTelAbstractTransformer, such as OTelSpanTransformer.
-	Most importantly, it one of these transformers must be an instance of OTelFamixValueLinker."
+	They should be a subclass of OTelAbstractTransformer, such as OTelSpanTransformer."
 
 	self subclassResponsibility
 ]
 
-{ #category : #transforming }
+{ #category : #'instance creation' }
+ModestTestGenerator >> newTraceValueLinker [
+	"Return a configured OTelFamixValueLinker."
+
+	self subclassResponsibility
+]
+
+{ #category : #running }
 ModestTestGenerator >> refactorAST [
 
 	self newASTRefactorer
@@ -185,14 +228,13 @@ ModestTestGenerator >> refactorAST [
 { #category : #running }
 ModestTestGenerator >> run [
 
-	| result |
-	report start.
+	self getCodebaseModel.
 	self importTraces.
-	self makeUnitTests.
+	self importTraceValues.
+	self buildUnitTests.
+	self exportUnitTests.
 	self refactorAST.
-	result := self exportUnitTests.
-	report end.
-	^ result
+	^ self exportAST
 ]
 
 { #category : #accessing }
