@@ -19,7 +19,7 @@ Class {
 		'isLocal',
 		'localDirectory'
 	],
-	#category : #Modest
+	#category : #'Modest-TestGenerator'
 }
 
 { #category : #testing }
