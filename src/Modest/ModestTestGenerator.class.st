@@ -238,6 +238,42 @@ ModestTestGenerator >> run [
 ]
 
 { #category : #accessing }
+ModestTestGenerator >> testASTModel [
+
+	^ testASTModel
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> testASTModel: aFASTModel [
+
+	testASTModel := aFASTModel
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> testModel [
+
+	^ testModel
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> testModel: aFamixUTModel [
+
+	testModel := aFamixUTModel
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> traceModel [
+
+	^ traceModel
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> traceModel: aFamixOTModel [
+
+	traceModel := aFamixOTModel
+]
+
+{ #category : #accessing }
 ModestTestGenerator >> tracesDirectory [
 
 	^ self localDirectory , 'traces/'
