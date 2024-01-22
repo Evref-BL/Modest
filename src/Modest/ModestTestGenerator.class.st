@@ -32,14 +32,14 @@ ModestTestGenerator class >> isAbstract [
 ModestTestGenerator class >> run [
 
 	<script>
-	^ self new run
+	^ self new runAsJob
 ]
 
 { #category : #running }
 ModestTestGenerator class >> runLocal [
 
 	<script>
-	^ self new beLocal run
+	^ self new beLocal runAsJob
 ]
 
 { #category : #accessing }
@@ -235,6 +235,54 @@ ModestTestGenerator >> run [
 	self exportUnitTests.
 	self refactorAST.
 	^ self exportAST
+]
+
+{ #category : #running }
+ModestTestGenerator >> runAsJob [
+
+	| result |
+	[ :job |
+	job
+		max: 8;
+		title: 'Running ' , self className;
+		increment;
+		title: 'Getting codebase model...'.
+	self getCodebaseModel.
+
+	job
+		increment;
+		title: 'Importing traces...'.
+	self importTraces.
+
+	job
+		increment;
+		title: 'Importing trace values...'.
+	self importTraceValues.
+
+	job
+		increment;
+		title: 'Building unit test model...'.
+	self buildUnitTests.
+
+	job
+		increment;
+		title: 'Building unit test AST...'.
+	self exportUnitTests.
+
+	job
+		increment;
+		title: 'Refactoring AST...'.
+	self refactorAST.
+
+	job
+		increment;
+		title: 'Exporting tests...'.
+	result := self exportAST.
+
+	job
+		progress: 1;
+		title: self className , ' done!' ] asJob run.
+	^ result
 ]
 
 { #category : #accessing }
