@@ -223,7 +223,7 @@ ModestReport >> writeStatistics [
 { #category : #writing }
 ModestReport >> writeToFile [
 
-	(testGenerator localDirectory asFileReference / 'reports'
+	(testGenerator localDirectory / 'reports'
 	 /
 		 ((start truncated asString replaceAll: $: with: $_)
 		  , '-ModestReport-' , testGenerator famixModel name , '.yaml'))

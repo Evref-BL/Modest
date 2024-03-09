@@ -1,6 +1,9 @@
+"
+A formatter that does nothing.
+"
 Class {
 	#name : #ModestNilFormatter,
-	#superclass : #Object,
+	#superclass : #ModestAbstractFormatter,
 	#category : #'Modest-Formatters'
 }
 

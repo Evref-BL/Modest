@@ -17,7 +17,11 @@ Class {
 		'testASTModel',
 		'entityFinder',
 		'isLocal',
-		'localDirectory'
+		'localDirectory',
+		'generatedFiles',
+		'formatter',
+		'sourceDirectory',
+		'withSuiteOptimization'
 	],
 	#category : #'Modest-TestGenerator'
 }
@@ -49,16 +53,30 @@ ModestTestGenerator >> beLocal [
 	isLocal := true
 ]
 
+{ #category : #accessing }
+ModestTestGenerator >> beWithSuiteOptimization [
+	"Whether to run the test suite optimization step."
+
+	withSuiteOptimization := true
+]
+
 { #category : #running }
 ModestTestGenerator >> buildUnitTests [
 	"Define how to construct the test model from the traces and values."
 
-	testModel := FamixUTImporter new fromOpenTelemetrySpans:
-		             traceModel allSpans.
+	"The spans are given from oldest to newest to maintain this order for the generated tests."
+	testModel := self newUnitTestImporter fromOpenTelemetrySpans:
+		             traceModel allSpans reversed.
 
 	"Make a suite with all generated test cases"
 	(testModel newSuiteNamed: 'ModestSuite') cases:
 		(testModel allWithType: FamixUTCase)
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> coverageDirectory [
+
+	^ (self tempDirectory / 'coverage') ensureCreateDirectory
 ]
 
 { #category : #running }
@@ -66,6 +84,12 @@ ModestTestGenerator >> exportAST [
 	"Define how the unit test AST model is exported into actual tests integrated into the tested application."
 
 	self subclassResponsibility
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> exportDirectory [
+
+	^ self sourceDirectory
 ]
 
 { #category : #running }
@@ -93,10 +117,37 @@ ModestTestGenerator >> famixModelName [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
-ModestTestGenerator >> formattersDirectory [
+{ #category : #running }
+ModestTestGenerator >> formatFiles [
 
-	^ self localDirectory , 'formatters/'
+	self formatter formatFiles: generatedFiles
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> formatter [
+
+	^ formatter ifNil: [ formatter := ModestNilFormatter new ]
+]
+
+{ #category : #utilities }
+ModestTestGenerator >> generateZip [
+	"Make a zip archive of the generated tests."
+
+	| zipName |
+	zipName := 'tests.' , DateAndTime now asFileNameCompatibleString
+	           , '.zip'.
+	LibC resultOfCommand:
+		'cd "' , self sourceDirectory pathString , '" && zip ' , zipName
+		, ' "' , ('" "' join: (self generatedFiles collect: [ :e |
+				  (e relativeTo: self sourceDirectory) pathString ])) , '" && mv '
+		, zipName , ' "' , self localDirectory pathString , '"'.
+	^ self localDirectory / zipName
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> generatedFiles [
+
+	^ generatedFiles
 ]
 
 { #category : #running }
@@ -130,19 +181,27 @@ ModestTestGenerator >> importTraces [
 { #category : #initialization }
 ModestTestGenerator >> initialize [
 
-	isLocal := false
+	isLocal := false.
+	withSuiteOptimization := false
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> libDirectory [
+
+	^ (self localDirectory / 'lib') ensureCreateDirectory
 ]
 
 { #category : #accessing }
 ModestTestGenerator >> localDirectory [
 
-	^ localDirectory ifNil: [ localDirectory := 'pharo-local/modest/' ]
+	^ localDirectory ifNil: [
+		  localDirectory := 'pharo-local' asFileReference / 'modest' ]
 ]
 
 { #category : #accessing }
-ModestTestGenerator >> localDirectory: aPathString [
+ModestTestGenerator >> localDirectory: aPath [
 
-	localDirectory := aPathString
+	localDirectory := aPath asFileReference
 ]
 
 { #category : #'instance creation' }
@@ -173,8 +232,8 @@ ModestTestGenerator >> newTraceExtractor [
 ModestTestGenerator >> newTraceFilename [
 
 	^ self tracesDirectory
-	  , (DateAndTime now truncated asString replaceAll: $: with: $_)
-	  , '-' , self famixModel name , '.json'
+	  / (DateAndTime now truncated asFileNameCompatibleString , '.'
+		   , self famixModel name) , 'json'
 ]
 
 { #category : #'instance creation' }
@@ -216,6 +275,38 @@ ModestTestGenerator >> newTraceValueLinker [
 	self subclassResponsibility
 ]
 
+{ #category : #'instance creation' }
+ModestTestGenerator >> newUnitTestImporter [
+
+	^ FamixUTImporter new
+]
+
+{ #category : #running }
+ModestTestGenerator >> optimizeSuite [
+	"### Problem
+We generate a lot of tests from traces, but we don't know if all of them are relevant.
+Multiple tests for the same method may have overlapping coverage, such as adding a user but with a different name.
+We want to maximize coverage **AND** minimize the coverage per test, without having redundant tests.
+This leads to a combinatorial problem with N tests for each tested method.
+We aim to identify the test combination that maximizes both coverage and the number of tests, while excluding redundant tests.
+
+### Solution
+For each tested method, obtain the coverage of each of its tests, and of all of their possible combinations.
+
+| combination | instructions | branch | line |
+| t1          |         2988 |     30 | 1128 |
+| t2          |         2966 |     30 | 1124 |
+| t3          |         2981 |     30 | 1128 |
+| t1_2        |         2988 |     32 | 1128 |
+| t1_3        |         3003 |     34 | 1132 | <- maximal, solution
+| t2_3        |         2981 |     32 | 1128 |
+| t1_2_3      |         3003 |     34 | 1132 | <- maximal but 2 is redundant
+
+Tools are required to obtain the coverage of each test (t1, t2...), and scripts can be used to merge coverage data to create the combination coverage data (t1_2, t1_3...)."
+
+	self subclassResponsibility
+]
+
 { #category : #running }
 ModestTestGenerator >> refactorAST [
 
@@ -227,6 +318,7 @@ ModestTestGenerator >> refactorAST [
 
 { #category : #running }
 ModestTestGenerator >> run [
+	"Execute the whole unit test generation pipeline."
 
 	self getCodebaseModel.
 	self importTraces.
@@ -234,55 +326,79 @@ ModestTestGenerator >> run [
 	self buildUnitTests.
 	self exportUnitTests.
 	self refactorAST.
-	^ self exportAST
+	self exportAST.
+	self optimizeSuite.
+	^ generatedFiles
 ]
 
 { #category : #running }
 ModestTestGenerator >> runAsJob [
 
-	| result |
 	[ :job |
-	job
-		max: 8;
-		title: 'Running ' , self className;
-		increment;
-		title: 'Getting codebase model...'.
+	job max: (withSuiteOptimization
+			 ifTrue: [ 8 ]
+			 ifFalse: [ 7 ]).
+	job title: 'Running ' , self className.
+	1 asDuration wait.
+
+	job title: 'Getting codebase model...'.
+	1 asDuration wait.
 	self getCodebaseModel.
+	job increment.
 
-	job
-		increment;
-		title: 'Importing traces...'.
+	job title: 'Importing traces...'.
+	1 asDuration wait.
 	self importTraces.
+	job increment.
 
-	job
-		increment;
-		title: 'Importing trace values...'.
+	job title: 'Importing trace values...'.
+	1 asDuration wait.
 	self importTraceValues.
+	job increment.
 
-	job
-		increment;
-		title: 'Building unit test model...'.
+	job title: 'Building unit test model...'.
+	1 asDuration wait.
 	self buildUnitTests.
+	job increment.
 
-	job
-		increment;
-		title: 'Building unit test AST...'.
+	job title: 'Building unit test AST...'.
+	1 asDuration wait.
 	self exportUnitTests.
+	job increment.
 
-	job
-		increment;
-		title: 'Refactoring AST...'.
+	job title: 'Refactoring AST...'.
+	1 asDuration wait.
 	self refactorAST.
+	job increment.
 
-	job
-		increment;
-		title: 'Exporting tests...'.
-	result := self exportAST.
+	job title: 'Exporting tests...'.
+	1 asDuration wait.
+	self exportAST.
+	job increment.
 
-	job
-		progress: 1;
-		title: self className , ' done!' ] asJob run.
-	^ result
+	withSuiteOptimization ifTrue: [
+		job title: 'Optimizing Suite...'.
+		1 asDuration wait.
+		self optimizeSuite.
+		job increment ].
+
+	job title: self className , ' done!'.
+	3 asDuration wait ] asJob run.
+	^ generatedFiles
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> sourceDirectory [
+
+	^ sourceDirectory ifNil: [
+		  sourceDirectory := self famixModel ifNotNil: [ :model |
+			                     model rootFolder ] ]
+]
+
+{ #category : #accessing }
+ModestTestGenerator >> tempDirectory [
+
+	^ (self localDirectory / 'temp') ensureCreateDirectory
 ]
 
 { #category : #accessing }
@@ -324,5 +440,5 @@ ModestTestGenerator >> traceModel: aFamixOTModel [
 { #category : #accessing }
 ModestTestGenerator >> tracesDirectory [
 
-	^ self localDirectory , 'traces/'
+	^ (self localDirectory / 'traces') ensureCreateDirectory
 ]

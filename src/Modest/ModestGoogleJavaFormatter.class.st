@@ -1,6 +1,9 @@
+"
+I format using a jar of [Google's Java formatter](https://github.com/google/google-java-format).
+"
 Class {
 	#name : #ModestGoogleJavaFormatter,
-	#superclass : #Object,
+	#superclass : #ModestAbstractFormatter,
 	#instVars : [
 		'jarPath'
 	],
@@ -22,16 +25,20 @@ ModestGoogleJavaFormatter >> formatFiles: files [
 	"See https://github.com/google/google-java-format. The command is:
 	java -jar /path/to/google-java-format-${GJF_VERSION?}-all-deps.jar --replace [files...]"
 
-	| command |
-	command := String streamContents: [ :stream |
-		           stream nextPutAll: 'java -jar "'.
-		           stream nextPutAll: jarPath.
-		           stream nextPutAll: '" --replace'.
-		           files do: [ :file |
-			           stream nextPutAll: ' "'.
-			           file absolutePath printPathOn: stream.
-			           stream nextPut: $" ] ].
-	LibC runCommand: command
+	LibC runCommand: (String streamContents: [ :stream |
+			 stream nextPutAll: 'java -jar "'.
+			 stream nextPutAll: jarPath.
+			 stream nextPutAll: '" --replace'.
+			 files do: [ :file |
+				 stream nextPutAll: ' "'.
+				 file absolutePath printPathOn: stream.
+				 stream nextPut: $" ] ])
+]
+
+{ #category : #accessing }
+ModestGoogleJavaFormatter >> jarPath [
+
+	^ jarPath
 ]
 
 { #category : #accessing }
