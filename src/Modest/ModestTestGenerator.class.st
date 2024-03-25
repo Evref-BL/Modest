@@ -327,7 +327,7 @@ ModestTestGenerator >> run [
 	self exportUnitTests.
 	self refactorAST.
 	self exportAST.
-	self optimizeSuite.
+	withSuiteOptimization ifTrue: [ self optimizeSuite ].
 	^ generatedFiles
 ]
 
@@ -339,46 +339,37 @@ ModestTestGenerator >> runAsJob [
 			 ifTrue: [ 8 ]
 			 ifFalse: [ 7 ]).
 	job title: 'Running ' , self className.
-	1 asDuration wait.
 
 	job title: 'Getting codebase model...'.
-	1 asDuration wait.
 	self getCodebaseModel.
 	job increment.
 
 	job title: 'Importing traces...'.
-	1 asDuration wait.
 	self importTraces.
 	job increment.
 
 	job title: 'Importing trace values...'.
-	1 asDuration wait.
 	self importTraceValues.
 	job increment.
 
 	job title: 'Building unit test model...'.
-	1 asDuration wait.
 	self buildUnitTests.
 	job increment.
 
 	job title: 'Building unit test AST...'.
-	1 asDuration wait.
 	self exportUnitTests.
 	job increment.
 
 	job title: 'Refactoring AST...'.
-	1 asDuration wait.
 	self refactorAST.
 	job increment.
 
 	job title: 'Exporting tests...'.
-	1 asDuration wait.
 	self exportAST.
 	job increment.
 
 	withSuiteOptimization ifTrue: [
 		job title: 'Optimizing Suite...'.
-		1 asDuration wait.
 		self optimizeSuite.
 		job increment ].
 
