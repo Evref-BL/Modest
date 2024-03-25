@@ -96,7 +96,7 @@ ModestTestGenerator >> exportDirectory [
 ModestTestGenerator >> exportUnitTests [
 	"Export the unit test model to AST."
 
-	self subclassResponsibility
+	testASTModel := self newUnitTestExporter export: testModel
 ]
 
 { #category : #accessing }
@@ -271,6 +271,13 @@ ModestTestGenerator >> newTraceTransformers [
 { #category : #'instance creation' }
 ModestTestGenerator >> newTraceValueLinker [
 	"Return a configured OTelFamixValueLinker."
+
+	self subclassResponsibility
+]
+
+{ #category : #'instance creation' }
+ModestTestGenerator >> newUnitTestExporter [
+	"Return a specific and configured subclass of FamixUTAbstractExporter."
 
 	self subclassResponsibility
 ]
