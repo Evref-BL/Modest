@@ -102,7 +102,9 @@ ModestTestGenerator >> exportUnitTests [
 { #category : #accessing }
 ModestTestGenerator >> famixModel [
 
-	^ famixModel
+	^ famixModel ifNil: [
+		  famixModel := MooseModel root detect: [ :model |
+			                model name = self famixModelName ] ]
 ]
 
 { #category : #accessing }
