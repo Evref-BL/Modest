@@ -12,9 +12,6 @@ Class {
 		'registry',
 		'rawConfiguration'
 	],
-	#classInstVars : [
-		'current'
-	],
 	#category : #'Modest-Configuration'
 }
 
@@ -166,7 +163,6 @@ ModestConfigurationReader >> loadAt: key [
 
 { #category : #enumerating }
 ModestConfigurationReader >> loadAt: key required: isRequired [
-	"Instantiate the configured type(s) and set their fields."
 
 	^ self
 		  loadAt: key
@@ -178,6 +174,7 @@ ModestConfigurationReader >> loadAt: key required: isRequired [
 
 { #category : #enumerating }
 ModestConfigurationReader >> loadAt: key withConfiguration: config [
+	"Instantiate the configured type(s) and set their fields."
 
 	| resolvedRegistry |
 	resolvedRegistry := self
