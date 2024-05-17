@@ -136,7 +136,7 @@ ModestEclipseJavaFormatter >> formatFiles: files [
 	vmPath ifNotNil: [ command << ' -vm "' << vmPath << '"' ].
 	files do: [ :file |
 		command nextPutAll: ' "'.
-		file absolutePath printPathOn: command.
+		file absolutePath canonicalize printPathOn: command.
 		command nextPut: $" ].
 	LibC resultOfCommand: command contents
 ]

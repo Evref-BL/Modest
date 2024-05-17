@@ -252,7 +252,7 @@ ModestConfigurationReader >> optionalDirectoryAt: key default: aBlockOrNil [
 					  ifExists: [ "register in rawConfig to allow references"
 						  rawConfiguration
 							  at: key
-							  put: directory absolutePath pathString ]
+							  put: directory absolutePath canonicalize pathString ]
 					  ifAbsent: [ nil ] ] ]
 ]
 

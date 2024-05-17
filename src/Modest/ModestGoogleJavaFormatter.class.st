@@ -31,7 +31,7 @@ ModestGoogleJavaFormatter >> formatFiles: files [
 			 options ifNotNil: [ stream << ' ' << options ].
 			 files do: [ :file |
 				 stream nextPutAll: ' "'.
-				 file absolutePath printPathOn: stream.
+				 file absolutePath canonicalize printPathOn: stream.
 				 stream nextPut: $" ] ])
 ]
 
