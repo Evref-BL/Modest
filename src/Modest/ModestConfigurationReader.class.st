@@ -75,20 +75,19 @@ ModestConfigurationReader >> configurationAt: key default: aBlockOrNil [
 ]
 
 { #category : #enumerating }
-ModestConfigurationReader >> existingDirectoryAt: key default: aBlockOrNil [
+ModestConfigurationReader >> existingDirectoryAt: key default: aBlock [
 	"Find a directory that must already exist.
-	In case the default is triggered, update the raw config to enable references."
+	In case the default is used, update the raw config to enable references."
 
-	| path directory |
+	| path |
 	path := self configurationAt: key default: [
-		        | default |
 		        rawConfiguration
 			        at: key
-			        put: (default := aBlockOrNil value) absolutePath pathString.
-		        default ].
-	(directory := path asFileReference) ifAbsent: [
-		ModestConfigurationMissingDirectory signalFor: key path: path ].
-	^ directory
+			        put:
+			        (path := aBlock value asAbsolute canonicalize) pathString.
+		        path ].
+	^ path asFileReference ifAbsent: [
+		  ModestConfigurationMissingDirectory signalFor: key path: path ]
 ]
 
 { #category : #initialization }
@@ -176,30 +175,33 @@ ModestConfigurationReader >> loadAt: key required: isRequired [
 ModestConfigurationReader >> loadAt: key withConfiguration: config [
 	"Instantiate the configured type(s) and set their fields."
 
-	| resolvedRegistry |
-	resolvedRegistry := self
-		                    resolve: key
-		                    in: registry
-		                    ifAbsent: [ :subKey :resolved |
-			                    ModestConfigurationRegistryError
-				                    signalFor: subKey
-				                    in: resolved ].
+	| aRegistry |
+	aRegistry := self
+		             resolve: key
+		             in: registry
+		             ifAbsent: [ :subKey :resolved |
+			             ModestConfigurationRegistryError
+				             signalFor: subKey
+				             in: resolved ].
 	"resolves to a single item"
 	config isDictionary ifTrue: [
 		^ self
-			  loadFrom: resolvedRegistry
+			  loadFrom: aRegistry
 			  at: (config
 					   at: '@type'
 					   ifAbsent: [
 					   ModestConfigurationMissing signalFor: key , '.@type' ])
 			  withConfiguration: config ].
-	"resolves to a list of items"
+	"must resolve to a list of items"
+	config isArray ifFalse: [
+		ModestConfigurationError signal:
+			'Expected a dictionary or an array at `' , key , '`' ].
 	^ config withIndexCollect: [ :itemConfig :index |
 		  self
-			  loadFrom: resolvedRegistry
+			  loadFrom: aRegistry
 			  at: (itemConfig at: '@type' ifAbsent: [
 					   ModestConfigurationMissing signalFor:
-						   key , '[' , (index - 1) asString , '].@type' ])
+						   key , '[' , index asString , '].@type' ])
 			  withConfiguration: itemConfig ]
 ]
 
