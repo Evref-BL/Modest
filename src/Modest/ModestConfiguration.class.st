@@ -25,8 +25,17 @@ Class {
 		'testExporter',
 		'refactorer'
 	],
+	#classVars : [
+		'Current'
+	],
 	#category : #'Modest-Configuration'
 }
+
+{ #category : #accessing }
+ModestConfiguration class >> current [
+
+	^ Current
+]
 
 { #category : #'accessing - other properties' }
 ModestConfiguration >> classpath [
@@ -109,6 +118,7 @@ ModestConfiguration >> famixModel: anObject [
 { #category : #initialization }
 ModestConfiguration >> initialize [
 
+	Current := self.
 	additionalConfiguration := SmallDictionary new
 ]
 
