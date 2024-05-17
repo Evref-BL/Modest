@@ -215,16 +215,26 @@ ModestConfigurationReader >> loadFrom: aRegistry at: key withConfiguration: aCon
 			             signalFor: key asLowercase
 			             in: aRegistry ]) new.
 	aConfiguration keysAndValuesDo: [ :field :value |
-		field = '@type' ifFalse: [
-			instance perform: field asSymbol asMutator with: (aRegistry
-					 at: field
-					 ifPresent: [ :fieldRegistry | "reference another type"
-						 self
-							 loadFrom: fieldRegistry
-							 at: (value at: '@type')
-							 withConfiguration: value ]
-					 ifAbsent: [ self parseValue: value ]) ] ].
+		field = '@type' ifFalse: [ "load objects, can be of another type from a subregistry"
+			instance perform: field asSymbol asMutator with: (self
+					 loadFrom: (aRegistry at: field ifAbsent: [ aRegistry ])
+					 parseValue: value) ] ].
 	^ instance
+]
+
+{ #category : #enumerating }
+ModestConfigurationReader >> loadFrom: aRegistry parseValue: value [
+
+	value isArray ifTrue: [
+		^ value collect: [ :elem |
+			  self loadFrom: aRegistry parseValue: elem ] ].
+	^ (value isDictionary and: [ value includesKey: '@type' ])
+		  ifFalse: [ "regular value" self parseValue: value ]
+		  ifTrue: [ "instantiate another type"
+			  self
+				  loadFrom: aRegistry
+				  at: (value at: '@type')
+				  withConfiguration: value ]
 ]
 
 { #category : #'instance creation' }
