@@ -256,9 +256,11 @@ ModestConfigurationReader >> optionalDirectoryAt: key default: aBlockOrNil [
 	^ rawConfiguration
 		  at: key
 		  ifPresent: [ :path |
-			  (self parseString: path) asFileReference ifAbsent: [
+			  (self parseString: path) asFileReference
+				  ifExists: [ :dir | dir asAbsolute canonicalize ]
+				  ifAbsent: [
 				  ModestConfigurationMissingDirectory signalFor: key path: path ] ]
-		  ifAbsent: [
+		  ifAbsent: [ "missing configuration, no problem"
 			  aBlockOrNil value ifNotNil: [ :directory |
 				  directory
 					  ifExists: [ "register in rawConfig to allow references"
@@ -410,9 +412,12 @@ ModestConfigurationReader >> readDirectoryConfiguration [
 	configuration localDirectory: (self
 			 existingDirectoryAt: 'localDirectory'
 			 default: [ 'pharo-local' asFileReference / 'modest' ]).
+
 	configuration sourceDirectory: (self
 			 existingDirectoryAt: 'sourceDirectory'
 			 default: [ configuration model rootFolder ]).
+	self updateSourceAnchors.
+
 	configuration exportDirectory:
 		(self configurationAt: 'exportDirectory') asFileReference.
 
@@ -420,12 +425,10 @@ ModestConfigurationReader >> readDirectoryConfiguration [
 	(self
 		 optionalDirectoryAt: 'libDirectory'
 		 default: [ configuration localDirectory / 'lib' ]) ifNotNil: [
-		:libDirectory |
-		configuration libDirectory: libDirectory asFileReference ].
+		:libDirectory | configuration libDirectory: libDirectory ].
 	(self optionalDirectoryAt: 'coverageTargetDirectory' default: nil)
 		ifNotNil: [ :coverageTargetDirectory |
-			configuration coverageTargetDirectory:
-				coverageTargetDirectory asFileReference ]
+			configuration coverageTargetDirectory: coverageTargetDirectory ]
 ]
 
 { #category : #configuration }
@@ -520,4 +523,34 @@ ModestConfigurationReader >> resolve: key in: dictionary ifAbsent: block [
 			         at: subKey
 			         ifAbsent: [ block cull: subKey cull: value ] ].
 	^ value
+]
+
+{ #category : #updating }
+ModestConfigurationReader >> updateSourceAnchors [
+	"Update all file source anchors in the model according to the configuration."
+
+	| newPath oldPath prefixSize anchors |
+	newPath := configuration sourceDirectory absolutePath canonicalize
+		           pathString.
+	configuration famixModel rootFolder: newPath.
+	(anchors := configuration famixModel allUsing: FamixTFileAnchor)
+		ifEmpty: [ ^ self ].
+	oldPath := anchors anyOne fileName.
+	prefixSize := 0.
+
+	[ "cut down oldPath from the root and prefix newPath until it exists"
+	(prefixSize := oldPath indexOf: $/ startingAt: prefixSize + 1) = 0
+		ifTrue: [
+			ModestConfigurationSourceNotFound
+				signalFor: anchors anyOne
+				in: newPath ].
+	(newPath , (oldPath allButFirst: prefixSize - 1)) asFileReference
+		ifExists: [ :file |
+			newPath := file absolutePath canonicalize pathString.
+			true ]
+		ifAbsent: [ false ] ] whileFalse.
+
+	anchors do: [ :anchor | "apply the path to all file anchors"
+		anchor fileName:
+			newPath , (anchor fileName allButFirst: prefixSize - 1) ]
 ]
