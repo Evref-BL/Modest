@@ -194,6 +194,12 @@ ModestConfiguration >> sourceDirectory: anObject [
 	sourceDirectory := anObject
 ]
 
+{ #category : #'accessing - computed' }
+ModestConfiguration >> tempDirectory [
+
+	^ self localDirectory / 'temp'
+]
+
 { #category : #accessing }
 ModestConfiguration >> testExporter [
 

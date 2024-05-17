@@ -105,13 +105,19 @@ ModestEclipseJavaFormatter >> findEclipsePathInMacOSApplications [
 					  (ZnCharacterReadStream on: s)
 						  encoder: aliasEncoder;
 						  contents ]) allRegexMatches: aliasRegex) ifNotEmpty: [ :refs |
-					^ refs first removePrefix: 'file://' ] ] ] ]
+					^ refs first allButFirst: 'file://' size ] ] ] ]
 ]
 
 { #category : #enumerating }
 ModestEclipseJavaFormatter >> findEclipsePathInWindows [
 
-	self shouldBeImplemented
+	^ FileLocator home directories
+		  detect: [ :dir | dir basename = 'eclipse' ]
+		  ifFound: [ :installs | "choose the latest installation"
+			  ((installs directories sort: [ :a :b |
+				    a modificationTime <= b modificationTime ]) last / 'eclipse'
+			   / 'eclipse.exe') pathString ]
+		  ifNone: [ nil ]
 ]
 
 { #category : #formatting }
@@ -119,10 +125,14 @@ ModestEclipseJavaFormatter >> formatFiles: files [
 	"eclipse -application org.eclipse.jdt.core.JavaCodeFormatter [ OPTIONS ] -config <configFile> <files>"
 
 	| command |
-	(command := WriteStream with: '"') << self eclipsePath
+	command := WriteStream with: (OSPlatform current isWindows
+			            ifTrue: [ "run the command in another terminal, not sure why but required"
+				            'cmd /c start "" "' ]
+			            ifFalse: [ '"' ]).
+	command << self eclipsePath
 	<< '" -application org.eclipse.jdt.core.JavaCodeFormatter -config "'
 	<< (configPath ifNil: [ self findConfigPathFrom: files first ])
-	<< '" -data "' << tempDirectory << '"'.
+	<< '" -data "' << self tempDirectory pathString << '"'.
 	vmPath ifNotNil: [ command << ' -vm "' << vmPath << '"' ].
 	files do: [ :file |
 		command nextPutAll: ' "'.
@@ -134,7 +144,8 @@ ModestEclipseJavaFormatter >> formatFiles: files [
 { #category : #accessing }
 ModestEclipseJavaFormatter >> tempDirectory [
 
-	^ tempDirectory
+	^ tempDirectory ifNil: [
+		  tempDirectory := ModestConfiguration current tempDirectory ]
 ]
 
 { #category : #accessing }
