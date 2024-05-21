@@ -529,28 +529,29 @@ ModestConfigurationReader >> resolve: key in: dictionary ifAbsent: block [
 ModestConfigurationReader >> updateSourceAnchors [
 	"Update all file source anchors in the model according to the configuration."
 
-	| newPath oldPath prefixSize anchors |
+	| newPath |
 	newPath := configuration sourceDirectory absolutePath canonicalize
 		           pathString.
 	configuration famixModel rootFolder: newPath.
-	(anchors := configuration famixModel allUsing: FamixTFileAnchor)
-		ifEmpty: [ ^ self ].
+	((configuration famixModel allUsing: FamixTFileAnchor) groupedBy: [
+		 :anchor | anchor fileName ]) do: [ :anchors |
+		self updateSourceAnchors: anchors with: newPath ]
+]
+
+{ #category : #updating }
+ModestConfigurationReader >> updateSourceAnchors: anchors with: newPath [
+	"Update all file source anchors of a common file, according to the configuration."
+
+	| oldPath prefixSize fileName |
 	oldPath := anchors anyOne fileName.
 	prefixSize := 0.
 
 	[ "cut down oldPath from the root and prefix newPath until it exists"
 	(prefixSize := oldPath indexOf: $/ startingAt: prefixSize + 1) = 0
 		ifTrue: [
-			ModestConfigurationSourceNotFound
-				signalFor: anchors anyOne
-				in: newPath ].
-	(newPath , (oldPath allButFirst: prefixSize - 1)) asFileReference
-		ifExists: [ :file |
-			newPath := file absolutePath canonicalize pathString.
-			true ]
-		ifAbsent: [ false ] ] whileFalse.
+		ModestConfigurationSourceNotFound signalFor: anchors in: newPath ].
 
-	anchors do: [ :anchor | "apply the path to all file anchors"
-		anchor fileName:
-			newPath , (anchor fileName allButFirst: prefixSize - 1) ]
+	(fileName := newPath , (oldPath allButFirst: prefixSize - 1))
+		asFileReference ifExists: [ :file |
+		^ anchors do: [ :anchor | anchor fileName: fileName ] ] ] repeat
 ]
