@@ -172,11 +172,6 @@ ModestTestGenerator >> run [
 ModestTestGenerator >> runAsJob [
 
 	[ :mainJob |
-	mainJob title: 'Running ' , self className.
-	mainJob max: (withSuiteOptimization
-			 ifTrue: [ 9 ]
-			 ifFalse: [ 8 ]).
-
 	[ :job |
 	job title: 'Getting codebase model...'.
 	self getCodebaseModel.
@@ -207,15 +202,18 @@ ModestTestGenerator >> runAsJob [
 	mainJob increment.
 
 	withSuiteOptimization ifTrue: [
-		job title: 'Optimizing Suite...'.
-		self optimizeSuite.
-		mainJob increment ].
+			job title: 'Optimizing Suite...'.
+			self optimizeSuite.
+			mainJob increment ].
 
 	job title: 'Cleaning up...'.
 	self cleanUp.
-	mainJob increment.
-
-	job title: self className , ' done!' ] asJob run ] asJob run.
+	mainJob increment ] asJob run ] asJob
+		title: 'Running ' , self className;
+		max: (withSuiteOptimization
+				 ifTrue: [ 9 ]
+				 ifFalse: [ 8 ]);
+		run.
 	^ generatedContent
 ]
 
