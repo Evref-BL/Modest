@@ -12,11 +12,13 @@ Class {
 		'famixModel',
 		'traceClassKey',
 		'traceMethodKey',
+		'traceReceiverKey',
 		'traceArgumentsKey',
 		'traceResultKey',
 		'localDirectory',
 		'sourceDirectory',
 		'exportDirectory',
+		'tracesDirectory',
 		'traceExtractor',
 		'traceLoader',
 		'traceTransformers',
@@ -75,22 +77,6 @@ ModestConfiguration >> coverageTargetDirectory: aFile [
 	additionalConfiguration at: 'coverageTargetDirectory' put: aFile
 ]
 
-{ #category : #'reflective operations' }
-ModestConfiguration >> doesNotUnderstand: aMessage [
-	"Add or get additional configuration."
-
-	super doesNotUnderstand: aMessage
-	"^ aMessage selector last == $:
-		  ifTrue: [
-			  additionalConfiguration
-				  at: aMessage selector allButLast
-				  put: aMessage arguments first ]
-		  ifFalse: [
-			  additionalConfiguration at: aMessage selector ifAbsent: [
-				  ModestConfigurationError signal:
-					  'No configuration found for `' , aMessage selector , '`.' ] ]"
-]
-
 { #category : #accessing }
 ModestConfiguration >> exportDirectory [
 
@@ -98,9 +84,9 @@ ModestConfiguration >> exportDirectory [
 ]
 
 { #category : #accessing }
-ModestConfiguration >> exportDirectory: anObject [
+ModestConfiguration >> exportDirectory: aFile [
 
-	exportDirectory := anObject
+	exportDirectory := aFile
 ]
 
 { #category : #accessing }
@@ -153,9 +139,9 @@ ModestConfiguration >> localDirectory [
 ]
 
 { #category : #accessing }
-ModestConfiguration >> localDirectory: anObject [
+ModestConfiguration >> localDirectory: aFile [
 
-	localDirectory := anObject
+	localDirectory := aFile
 ]
 
 { #category : #accessing }
@@ -219,9 +205,9 @@ ModestConfiguration >> traceArgumentsKey [
 ]
 
 { #category : #accessing }
-ModestConfiguration >> traceArgumentsKey: anObject [
+ModestConfiguration >> traceArgumentsKey: aString [
 
-	traceArgumentsKey := anObject
+	traceArgumentsKey := aString
 ]
 
 { #category : #accessing }
@@ -231,9 +217,9 @@ ModestConfiguration >> traceClassKey [
 ]
 
 { #category : #accessing }
-ModestConfiguration >> traceClassKey: anObject [
+ModestConfiguration >> traceClassKey: aString [
 
-	traceClassKey := anObject
+	traceClassKey := aString
 ]
 
 { #category : #accessing }
@@ -267,9 +253,21 @@ ModestConfiguration >> traceMethodKey [
 ]
 
 { #category : #accessing }
-ModestConfiguration >> traceMethodKey: anObject [
+ModestConfiguration >> traceMethodKey: aString [
 
-	traceMethodKey := anObject
+	traceMethodKey := aString
+]
+
+{ #category : #accessing }
+ModestConfiguration >> traceReceiverKey [
+
+	^ traceReceiverKey
+]
+
+{ #category : #accessing }
+ModestConfiguration >> traceReceiverKey: aString [
+
+	traceReceiverKey := aString
 ]
 
 { #category : #accessing }
@@ -279,9 +277,9 @@ ModestConfiguration >> traceResultKey [
 ]
 
 { #category : #accessing }
-ModestConfiguration >> traceResultKey: anObject [
+ModestConfiguration >> traceResultKey: aString [
 
-	traceResultKey := anObject
+	traceResultKey := aString
 ]
 
 { #category : #accessing }
@@ -294,6 +292,18 @@ ModestConfiguration >> traceTransformers [
 ModestConfiguration >> traceTransformers: anObject [
 
 	traceTransformers := anObject
+]
+
+{ #category : #'accessing - other properties' }
+ModestConfiguration >> tracesDirectory [
+
+	^ tracesDirectory
+]
+
+{ #category : #'accessing - other properties' }
+ModestConfiguration >> tracesDirectory: aFile [
+
+	tracesDirectory := aFile
 ]
 
 { #category : #accessing }

@@ -273,7 +273,7 @@ ModestConfigurationReader >> optionalDirectoryAt: key default: aBlockOrNil [
 { #category : #parsing }
 ModestConfigurationReader >> parseEvaluatedString: str [
 
-	^ [ (RBParser parseExpression: str) evaluate ]
+	^ [ OpalCompiler new evaluate: (self parseRegularString: str) ]
 		  on: Error
 		  do: [ :error |
 			  ModestConfigurationError signal:
@@ -422,10 +422,12 @@ ModestConfigurationReader >> readDirectoryConfiguration [
 		(self configurationAt: 'exportDirectory') asFileReference.
 
 	"additional directories"
-	(self
-		 optionalDirectoryAt: 'libDirectory'
-		 default: [ configuration localDirectory / 'lib' ]) ifNotNil: [
-		:libDirectory | configuration libDirectory: libDirectory ].
+	configuration tracesDirectory: (self
+			 optionalDirectoryAt: 'tracesDirectory'
+			 default: [ configuration localDirectory / 'traces' ]).
+	configuration libDirectory: (self
+			 optionalDirectoryAt: 'libDirectory'
+			 default: [ configuration localDirectory / 'lib' ]).
 	(self optionalDirectoryAt: 'coverageTargetDirectory' default: nil)
 		ifNotNil: [ :coverageTargetDirectory |
 			configuration coverageTargetDirectory: coverageTargetDirectory ]

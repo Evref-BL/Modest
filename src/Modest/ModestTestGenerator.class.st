@@ -164,8 +164,7 @@ ModestTestGenerator >> run [
 	self refactorAST.
 	self exportAST.
 	withSuiteOptimization ifTrue: [ self optimizeSuite ].
-	self cleanUp.
-	^ generatedContent
+	self cleanUp
 ]
 
 { #category : #running }
@@ -213,8 +212,7 @@ ModestTestGenerator >> runAsJob [
 		max: (withSuiteOptimization
 				 ifTrue: [ 9 ]
 				 ifFalse: [ 8 ]);
-		run.
-	^ generatedContent
+		run
 ]
 
 { #category : #accessing }
