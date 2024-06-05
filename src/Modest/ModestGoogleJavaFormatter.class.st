@@ -18,7 +18,7 @@ ModestGoogleJavaFormatter class >> findJarInDirectory: directory [
 		  detect: [ :file |
 			  (file basename beginsWith: 'google-java-format') and: [
 				  file extension = 'jar' ] ]
-		  ifOne: [ :file | self new jarPath: file pathString ]
+		  ifFound: [ :file | self new jarPath: file pathString ]
 ]
 
 { #category : #formatting }
