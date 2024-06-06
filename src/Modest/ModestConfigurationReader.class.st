@@ -546,8 +546,10 @@ ModestConfigurationReader >> updateSourceAnchors: anchors with: newPath [
 
 	| oldPath prefixSize fileName |
 	oldPath := anchors anyOne fileName.
-	prefixSize := 0.
+	((oldPath beginsWith: newPath) and: [ oldPath asFileReference exists ])
+		ifTrue: [ ^ self ].
 
+	prefixSize := 0.
 	[ "cut down oldPath from the root and prefix newPath until it exists"
 	(prefixSize := oldPath indexOf: $/ startingAt: prefixSize + 1) = 0
 		ifTrue: [
