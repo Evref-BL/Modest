@@ -105,7 +105,8 @@ ModestEclipseJavaFormatter >> findEclipsePathInMacOSApplications [
 					  (ZnCharacterReadStream on: s)
 						  encoder: aliasEncoder;
 						  contents ]) allRegexMatches: aliasRegex) ifNotEmpty: [ :refs |
-					^ refs first allButFirst: 'file://' size ] ] ] ]
+					^ refs first allButFirst: 'file://' size ] ] ] ].
+	^ nil
 ]
 
 { #category : #enumerating }
@@ -113,10 +114,12 @@ ModestEclipseJavaFormatter >> findEclipsePathInWindows [
 
 	^ FileLocator home directories
 		  detect: [ :dir | dir basename = 'eclipse' ]
-		  ifFound: [ :installs | "choose the latest installation"
-			  ((installs directories sort: [ :a :b |
-				    a modificationTime <= b modificationTime ]) last / 'eclipse'
-			   / 'eclipse.exe') pathString ]
+		  ifFound: [ :installs | "choose the latest valid installation"
+			  (installs directories sort: [ :a :b |
+				   a modificationTime > b modificationTime ]) do: [ :install |
+				  install / 'eclipse' / 'eclipse.exe' ifExists: [ :exe |
+					  ^ exe pathString ] ].
+			  nil ]
 		  ifNone: [ nil ]
 ]
 
