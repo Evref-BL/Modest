@@ -229,32 +229,6 @@ ModestHardCodedTestGenerator >> newUnitTestExporter [
 ]
 
 { #category : #running }
-ModestHardCodedTestGenerator >> optimizeSuite [
-	"### Problem
-We generate a lot of tests from traces, but we don't know if all of them are relevant.
-Multiple tests for the same method may have overlapping coverage, such as adding a user but with a different name.
-We want to maximize coverage **AND** minimize the coverage per test, without having redundant tests.
-This leads to a combinatorial problem with N tests for each tested method.
-We aim to identify the test combination that maximizes both coverage and the number of tests, while excluding redundant tests.
-
-### Solution
-For each tested method, obtain the coverage of each of its tests, and of all of their possible combinations.
-
-| combination | instructions | branch | line |
-| t1          |         2988 |     30 | 1128 |
-| t2          |         2966 |     30 | 1124 |
-| t3          |         2981 |     30 | 1128 |
-| t1_2        |         2988 |     32 | 1128 |
-| t1_3        |         3003 |     34 | 1132 | <- maximal, solution
-| t2_3        |         2981 |     32 | 1128 |
-| t1_2_3      |         3003 |     34 | 1132 | <- maximal but 2 is redundant
-
-Tools are required to obtain the coverage of each test (t1, t2...), and scripts can be used to merge coverage data to create the combination coverage data (t1_2, t1_3...)."
-
-	self subclassResponsibility
-]
-
-{ #category : #running }
 ModestHardCodedTestGenerator >> refactorAST [
 
 	[

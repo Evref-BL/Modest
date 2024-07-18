@@ -7,6 +7,12 @@ Class {
 	#category : #'Modest-Formatters'
 }
 
+{ #category : #testing }
+ModestAbstractFormatter class >> isAbstract [
+
+	^ self == ModestAbstractFormatter
+]
+
 { #category : #formatting }
 ModestAbstractFormatter >> formatFiles: files [
 	"Implement logic to apply formatting to source files."
