@@ -88,10 +88,10 @@ ModestHardCodedTestGenerator >> generateArchive [
 	| zipName |
 	zipName := 'tests.' , DateAndTime now asFileNameCompatibleString
 	           , '.zip'.
-	LibC resultOfCommand:
-		'cd "' , self sourceDirectory pathString , '" && zip ' , zipName
+	LibC runCommand:
+		'cd "' , self exportDirectory pathString , '" && zip ' , zipName
 		, ' "' , ('" "' join: (self generatedContent collect: [ :e |
-				  (e relativeTo: self sourceDirectory) pathString ])) , '" && mv '
+				  (e relativeTo: self exportDirectory) pathString ])) , '" && mv '
 		, zipName , ' "' , self localDirectory pathString , '"'.
 	^ self localDirectory / zipName
 ]
