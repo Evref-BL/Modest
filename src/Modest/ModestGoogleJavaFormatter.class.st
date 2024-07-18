@@ -26,7 +26,7 @@ ModestGoogleJavaFormatter >> formatFiles: files [
 	"See https://github.com/google/google-java-format. The command is:
 	java -jar /path/to/google-java-format-${GJF_VERSION?}-all-deps.jar -replace <options> [files...]"
 
-	LibC resultOfCommand: (String streamContents: [ :stream |
+	LibC runCommand: (String streamContents: [ :stream |
 			 stream << 'java -jar "' << jarPath << '" -replace'.
 			 options ifNotNil: [ stream << ' ' << options ].
 			 files do: [ :file |

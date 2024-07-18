@@ -141,7 +141,7 @@ ModestEclipseJavaFormatter >> formatFiles: files [
 		command nextPutAll: ' "'.
 		file absolutePath canonicalize printPathOn: command.
 		command nextPut: $" ].
-	LibC resultOfCommand: command contents
+	LibC runCommand: command contents
 ]
 
 { #category : #accessing }
