@@ -8,12 +8,20 @@ Class {
 }
 
 { #category : #running }
-ModestConfigurableTestGenerator class >> runWith: aConfigurationFile [
+ModestConfigurableTestGenerator class >> runFrom: aConfigurationFile [
 
 	^ self new
 		  configuration:
 			  (ModestConfigurationReader readConfigurationFromFile:
 					   aConfigurationFile);
+		  runAsJob
+]
+
+{ #category : #running }
+ModestConfigurableTestGenerator class >> runWith: aConfiguration [
+
+	^ self new
+		  configuration: aConfiguration;
 		  runAsJob
 ]
 
