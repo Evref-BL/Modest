@@ -52,6 +52,23 @@ ModestConfigurableTestGenerator >> exportUnitTests [
 	testASTModel := configuration testExporter export: testModel
 ]
 
+{ #category : #utilities }
+ModestConfigurableTestGenerator >> generateArchive [
+	"Make a zip archive of the generated tests."
+
+	| zipName |
+	zipName := 'tests.' , DateAndTime now asFileNameCompatibleString
+	           , '.zip'.
+	LibC runCommand:
+		'cd "' , configuration exportDirectory pathString , '" && zip '
+		, zipName , ' "'
+		, ('" "' join: (self generatedContent collect: [ :e |
+					  (e relativeTo: configuration exportDirectory) pathString ]))
+		, '" && mv ' , zipName , ' "'
+		, configuration localDirectory pathString , '"'.
+	^ configuration localDirectory / zipName
+]
+
 { #category : #running }
 ModestConfigurableTestGenerator >> getCodebaseModel [
 
