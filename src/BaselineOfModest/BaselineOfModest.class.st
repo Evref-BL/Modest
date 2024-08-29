@@ -33,7 +33,5 @@ BaselineOfModest >> dependencies: spec [
 { #category : #baselines }
 BaselineOfModest >> packages: spec [
 
-	spec
-		package: 'Modest';
-		package: 'Modest-Report'
+	spec package: 'Modest'
 ]
