@@ -8,30 +8,32 @@ To be used, Eclipse must be installed, and the following data is required:
 Optionally, you can specify the path to a Java VM.
 "
 Class {
-	#name : #ModestEclipseJavaFormatter,
-	#superclass : #ModestAbstractFormatter,
+	#name : 'ModestEclipseJavaFormatter',
+	#superclass : 'ModestAbstractFormatter',
 	#instVars : [
 		'eclipsePath',
 		'vmPath',
 		'configPath',
 		'tempDirectory'
 	],
-	#category : #'Modest-Formatters'
+	#category : 'Modest-Formatters',
+	#package : 'Modest',
+	#tag : 'Formatters'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestEclipseJavaFormatter >> configPath [
 
 	^ configPath
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestEclipseJavaFormatter >> configPath: aPathString [
 
 	configPath := aPathString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestEclipseJavaFormatter >> eclipsePath [
 
 	^ eclipsePath ifNil: [
@@ -40,13 +42,13 @@ ModestEclipseJavaFormatter >> eclipsePath [
 				  'Unable to locate Eclipse application. Please ensure the `eclipsePath` is correct and try again.' ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestEclipseJavaFormatter >> eclipsePath: aPathString [
 
 	eclipsePath := aPathString
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestEclipseJavaFormatter >> findConfigPathFrom: aFileToFormat [
 	"Find the default Eclipse configuration file located in `.settings/org.eclipse.jdt.core.prefs` relative to a project's root folder."
 
@@ -64,7 +66,7 @@ ModestEclipseJavaFormatter >> findConfigPathFrom: aFileToFormat [
 		'Unable to locate Eclipse formatter configuration file, ensure the `configPath` is correct and try again.'
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestEclipseJavaFormatter >> findEclipsePath [
 	"Try to find the path to the Eclipse executable."
 
@@ -74,7 +76,7 @@ ModestEclipseJavaFormatter >> findEclipsePath [
 	^ nil
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestEclipseJavaFormatter >> findEclipsePathInMacOS [
 	"First search in /Applications, then try to find it in $PATH."
 
@@ -86,7 +88,7 @@ ModestEclipseJavaFormatter >> findEclipsePathInMacOS [
 	^ nil
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestEclipseJavaFormatter >> findEclipsePathInMacOSApplications [
 	"Search the /Applications directory and handle aliases."
 
@@ -109,7 +111,7 @@ ModestEclipseJavaFormatter >> findEclipsePathInMacOSApplications [
 	^ nil
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestEclipseJavaFormatter >> findEclipsePathInWindows [
 
 	^ FileLocator home directories
@@ -123,7 +125,7 @@ ModestEclipseJavaFormatter >> findEclipsePathInWindows [
 		  ifNone: [ nil ]
 ]
 
-{ #category : #formatting }
+{ #category : 'formatting' }
 ModestEclipseJavaFormatter >> formatFiles: files [
 	"eclipse -application org.eclipse.jdt.core.JavaCodeFormatter [ OPTIONS ] -config <configFile> <files>"
 
@@ -144,26 +146,26 @@ ModestEclipseJavaFormatter >> formatFiles: files [
 	LibC runCommand: command contents
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestEclipseJavaFormatter >> tempDirectory [
 
 	^ tempDirectory ifNil: [
 		  tempDirectory := ModestConfiguration current tempDirectory ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestEclipseJavaFormatter >> tempDirectory: aPathString [
 
 	tempDirectory := aPathString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestEclipseJavaFormatter >> vmPath [
 
 	^ vmPath
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestEclipseJavaFormatter >> vmPath: aPathString [
 
 	vmPath := aPathString

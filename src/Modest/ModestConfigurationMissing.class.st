@@ -2,12 +2,14 @@
 Thrown when the configuration file or a required configuration item is missing.
 "
 Class {
-	#name : #ModestConfigurationMissing,
-	#superclass : #ModestConfigurationError,
-	#category : #'Modest-Configuration'
+	#name : 'ModestConfigurationMissing',
+	#superclass : 'ModestConfigurationError',
+	#category : 'Modest-Configuration',
+	#package : 'Modest',
+	#tag : 'Configuration'
 }
 
-{ #category : #signalling }
+{ #category : 'signalling' }
 ModestConfigurationMissing class >> signalFor: aKey [
 
 	self new
@@ -16,7 +18,7 @@ ModestConfigurationMissing class >> signalFor: aKey [
 		signal
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfigurationMissing >> messageText [
 	"Return an exception's message text."
 

@@ -2,16 +2,18 @@
 I format using a jar of [Google's Java formatter](https://github.com/google/google-java-format).
 "
 Class {
-	#name : #ModestGoogleJavaFormatter,
-	#superclass : #ModestAbstractFormatter,
+	#name : 'ModestGoogleJavaFormatter',
+	#superclass : 'ModestAbstractFormatter',
 	#instVars : [
 		'jarPath',
 		'options'
 	],
-	#category : #'Modest-Formatters'
+	#category : 'Modest-Formatters',
+	#package : 'Modest',
+	#tag : 'Formatters'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestGoogleJavaFormatter class >> findJarInDirectory: directory [
 
 	^ directory files
@@ -21,7 +23,7 @@ ModestGoogleJavaFormatter class >> findJarInDirectory: directory [
 		  ifFound: [ :file | self new jarPath: file pathString ]
 ]
 
-{ #category : #formatting }
+{ #category : 'formatting' }
 ModestGoogleJavaFormatter >> formatFiles: files [
 	"See https://github.com/google/google-java-format. The command is:
 	java -jar /path/to/google-java-format-${GJF_VERSION?}-all-deps.jar -replace <options> [files...]"
@@ -35,25 +37,25 @@ ModestGoogleJavaFormatter >> formatFiles: files [
 				 stream nextPut: $" ] ])
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestGoogleJavaFormatter >> jarPath [
 
 	^ jarPath
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestGoogleJavaFormatter >> jarPath: aPathString [
 
 	jarPath := aPathString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestGoogleJavaFormatter >> options [
 
 	^ options
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestGoogleJavaFormatter >> options: aString [
 	"Expect a string containing the options as if given on the command line:
 	--aosp, -aosp, -a

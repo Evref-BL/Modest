@@ -3,8 +3,8 @@ I represent the configuration data read from a configuration file by `ModestConf
 I serve as the central repository for storing all parameters and settings required for running `ModestConfigurableTestGenerator`.
 "
 Class {
-	#name : #ModestConfiguration,
-	#superclass : #Object,
+	#name : 'ModestConfiguration',
+	#superclass : 'Object',
 	#instVars : [
 		'additionalConfiguration',
 		'name',
@@ -30,40 +30,42 @@ Class {
 	#classVars : [
 		'Current'
 	],
-	#category : #'Modest-Configuration'
+	#category : 'Modest-Configuration',
+	#package : 'Modest',
+	#tag : 'Configuration'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration class >> current [
 
 	^ Current
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> classpath [
 
 	^ additionalConfiguration at: 'classpath' ifAbsent: [ nil ]
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> classpath: aString [
 
 	additionalConfiguration at: 'classpath' put: aString
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> codeFormatter [
 
 	^ additionalConfiguration at: 'codeFormatter' ifAbsent: [ nil ]
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> codeFormatter: aFormatter [
 
 	additionalConfiguration at: 'codeFormatter' put: aFormatter
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> coverageTargetDirectory [
 
 	^ additionalConfiguration
@@ -71,260 +73,260 @@ ModestConfiguration >> coverageTargetDirectory [
 		  ifAbsent: [ nil ]
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> coverageTargetDirectory: aFile [
 
 	additionalConfiguration at: 'coverageTargetDirectory' put: aFile
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> exportDirectory [
 
 	^ exportDirectory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> exportDirectory: aFile [
 
 	exportDirectory := aFile
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> famixModel [
 
 	^ famixModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> famixModel: anObject [
 
 	famixModel := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ModestConfiguration >> initialize [
 
 	Current := self.
 	additionalConfiguration := SmallDictionary new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> language [
 
 	^ language
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> language: aString [
 
 	language := aString
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> libDirectory [
 
 	^ additionalConfiguration at: 'libDirectory' ifAbsent: [ nil ]
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> libDirectory: aFile [
 
 	additionalConfiguration at: 'libDirectory' put: aFile
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> localDirectory [
 
 	^ localDirectory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> localDirectory: aFile [
 
 	localDirectory := aFile
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> refactorer [
 
 	^ refactorer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> refactorer: anObject [
 
 	refactorer := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> sourceDirectory [
 
 	^ sourceDirectory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> sourceDirectory: anObject [
 
 	sourceDirectory := anObject
 ]
 
-{ #category : #'accessing - computed' }
+{ #category : 'accessing - computed' }
 ModestConfiguration >> tempDirectory [
 
 	^ self localDirectory / 'temp'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> testExporter [
 
 	^ testExporter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> testExporter: anObject [
 
 	testExporter := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceArgumentsKey [
 
 	^ traceArgumentsKey
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceArgumentsKey: aString [
 
 	traceArgumentsKey := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceClassKey [
 
 	^ traceClassKey
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceClassKey: aString [
 
 	traceClassKey := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceExtractor [
 
 	^ traceExtractor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceExtractor: anObject [
 
 	traceExtractor := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceLoader [
 
 	^ traceLoader
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceLoader: anObject [
 
 	traceLoader := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceMethodKey [
 
 	^ traceMethodKey
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceMethodKey: aString [
 
 	traceMethodKey := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceReceiverKey [
 
 	^ traceReceiverKey
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceReceiverKey: aString [
 
 	traceReceiverKey := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceResultKey [
 
 	^ traceResultKey
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceResultKey: aString [
 
 	traceResultKey := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceTransformers [
 
 	^ traceTransformers
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> traceTransformers: anObject [
 
 	traceTransformers := anObject
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> tracesDirectory [
 
 	^ tracesDirectory
 ]
 
-{ #category : #'accessing - other properties' }
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> tracesDirectory: aFile [
 
 	tracesDirectory := aFile
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> valueExporter [
 
 	^ valueExporter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> valueExporter: anObject [
 
 	valueExporter := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> valueImporter [
 
 	^ valueImporter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfiguration >> valueImporter: anObject [
 
 	valueImporter := anObject

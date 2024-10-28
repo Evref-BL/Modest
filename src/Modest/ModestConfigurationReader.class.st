@@ -5,17 +5,19 @@ I consume a configuration file located at the specified path from one of the fol
 - the default location, `./pharo-local/modest/modest.json`
 "
 Class {
-	#name : #ModestConfigurationReader,
-	#superclass : #Object,
+	#name : 'ModestConfigurationReader',
+	#superclass : 'Object',
 	#instVars : [
 		'configuration',
 		'registry',
 		'rawConfiguration'
 	],
-	#category : #'Modest-Configuration'
+	#category : 'Modest-Configuration',
+	#package : 'Modest',
+	#tag : 'Configuration'
 }
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader class >> findConfigurationFile [
 	"Can be given as first CLI argument or with the MODEST_CONFIGURATION environment variable.
 	Falls back to the default location: ./pharo-local/modest/config.json."
@@ -32,31 +34,31 @@ ModestConfigurationReader class >> findConfigurationFile [
 		  asFileReference ifAbsent: [ ModestConfigurationMissing signal ]
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader class >> readConfiguration [
 
 	^ self readConfigurationFromFile: self findConfigurationFile
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader class >> readConfigurationFrom: aDictionary [
 
 	^ self new readConfigurationFrom: aDictionary
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader class >> readConfigurationFromFile: aConfigurationFile [
 
 	^ self new readConfigurationFromFile: aConfigurationFile
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader >> configurationAt: key [
 
 	^ self configurationAt: key default: nil
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader >> configurationAt: key default: aBlockOrNil [
 	"The key can be made of subkeys separated by a dot, e.g. `traces.loader.type`"
 
@@ -74,7 +76,7 @@ ModestConfigurationReader >> configurationAt: key default: aBlockOrNil [
 	^ data
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader >> existingDirectoryAt: key default: aBlock [
 	"Find a directory that must already exist.
 	In case the default is used, update the raw config to enable references."
@@ -90,14 +92,14 @@ ModestConfigurationReader >> existingDirectoryAt: key default: aBlock [
 		  ModestConfigurationMissingDirectory signalFor: key path: path ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ModestConfigurationReader >> initialize [
 
 	self initializeRegistry.
 	configuration := ModestConfiguration new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ModestConfigurationReader >> initializeRegistry [
 
 	| traceRegistry valueRegistry testRegistry |
@@ -154,13 +156,13 @@ ModestConfigurationReader >> initializeRegistry [
 		in: (testRegistry at: 'codeFormatter' put: Dictionary new)
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader >> loadAt: key [
 
 	^ self loadAt: key required: true
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader >> loadAt: key required: isRequired [
 
 	^ self
@@ -171,7 +173,7 @@ ModestConfigurationReader >> loadAt: key required: isRequired [
 			   default: [ isRequired ifFalse: [ ^ nil ] ])
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader >> loadAt: key withConfiguration: config [
 	"Instantiate the configured type(s) and set their fields."
 
@@ -205,7 +207,7 @@ ModestConfigurationReader >> loadAt: key withConfiguration: config [
 			  withConfiguration: itemConfig ]
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader >> loadFrom: aRegistry at: key withConfiguration: aConfiguration [
 	"Instantiate the configured type(s) and set their fields."
 
@@ -222,7 +224,7 @@ ModestConfigurationReader >> loadFrom: aRegistry at: key withConfiguration: aCon
 	^ instance
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader >> loadFrom: aRegistry parseValue: value [
 
 	value isArray ifTrue: [
@@ -237,7 +239,7 @@ ModestConfigurationReader >> loadFrom: aRegistry parseValue: value [
 				  withConfiguration: value ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestConfigurationReader >> newTraceDistinctQuery [
 
 	^ OTelDistinctQuery selector: [ :span |
@@ -246,11 +248,18 @@ ModestConfigurationReader >> newTraceDistinctQuery [
 		  {
 			  (tags at: configuration traceClassKey).
 			  (tags at: configuration traceMethodKey).
+			  (tags at: configuration traceReceiverKey).
 			  (tags at: configuration traceArgumentsKey).
 			  (tags at: configuration traceResultKey) } hash ]
 ]
 
-{ #category : #enumerating }
+{ #category : 'instance creation' }
+ModestConfigurationReader >> newTraceTransformers [
+
+	^ { self newTraceDistinctQuery }
+]
+
+{ #category : 'enumerating' }
 ModestConfigurationReader >> optionalDirectoryAt: key default: aBlockOrNil [
 
 	^ rawConfiguration
@@ -270,7 +279,7 @@ ModestConfigurationReader >> optionalDirectoryAt: key default: aBlockOrNil [
 					  ifAbsent: [ nil ] ] ]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 ModestConfigurationReader >> parseEvaluatedString: str [
 
 	^ [ OpalCompiler new evaluate: (self parseRegularString: str) ]
@@ -281,7 +290,7 @@ ModestConfigurationReader >> parseEvaluatedString: str [
 				  , error messageText ]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 ModestConfigurationReader >> parseFileString: str [
 	"The string references a file whose contents are read."
 
@@ -291,7 +300,7 @@ ModestConfigurationReader >> parseFileString: str [
 		'File at `' , str , '` does not exist.'
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 ModestConfigurationReader >> parseRegularString: str [
 	"The string may reference other values in the configuration by giving their path in braces."
 
@@ -312,7 +321,7 @@ ModestConfigurationReader >> parseRegularString: str [
 		  self parseString: value ]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 ModestConfigurationReader >> parseString: str [
 	"String values can either:
 	- evaluate Pharo code,
@@ -321,6 +330,7 @@ ModestConfigurationReader >> parseString: str [
 	- interpolate references to other values from the configuration."
 
 	| firstChar |
+	str ifEmpty: [ ^ str ].
 	firstChar := str at: 1.
 	firstChar == $= ifTrue: [
 		^ self parseEvaluatedString: str allButFirst ].
@@ -330,7 +340,7 @@ ModestConfigurationReader >> parseString: str [
 	^ self parseRegularString: str
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 ModestConfigurationReader >> parseValue: value [
 
 	value isString ifTrue: [ ^ self parseString: value ].
@@ -345,7 +355,7 @@ ModestConfigurationReader >> parseValue: value [
 	^ value
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 ModestConfigurationReader >> parseVariableString: str [
 
 	^ OSEnvironment current
@@ -355,14 +365,14 @@ ModestConfigurationReader >> parseVariableString: str [
 				  'Environment variable named `' , str , '` not found.' ]
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readAdditionalConfiguration [
 	"Depending on the current state of the configuration, read additional entries."
 
 	configuration language = 'java' ifTrue: [ self readJavaConfiguration ]
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readBaseConfiguration [
 	"Read application name and language, then find the corresponding model in the image."
 
@@ -380,7 +390,7 @@ ModestConfigurationReader >> readBaseConfiguration [
 					 'Unable to find application model named `' , name , '`.' ])
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readConfiguration [
 
 	self readBaseConfiguration.
@@ -392,21 +402,21 @@ ModestConfigurationReader >> readConfiguration [
 	^ configuration
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readConfigurationFrom: aDictionary [
 
 	rawConfiguration := aDictionary.
 	^ self readConfiguration
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readConfigurationFromFile: aFile [
 
 	^ self readConfigurationFrom:
 		  (aFile asFileReference readStreamDo: [ :s | STON fromStream: s ])
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readDirectoryConfiguration [
 
 	configuration localDirectory: (self
@@ -424,24 +434,27 @@ ModestConfigurationReader >> readDirectoryConfiguration [
 	"additional directories"
 	configuration tracesDirectory: (self
 			 optionalDirectoryAt: 'tracesDirectory'
-			 default: [ configuration localDirectory / 'traces' ]).
+			 default: [
+			 (configuration localDirectory / 'traces') ensureCreateDirectory ]).
 	configuration libDirectory: (self
 			 optionalDirectoryAt: 'libDirectory'
-			 default: [ configuration localDirectory / 'lib' ]).
+			 default: [
+			 (configuration localDirectory / 'lib') ensureCreateDirectory ]).
 	(self optionalDirectoryAt: 'coverageTargetDirectory' default: nil)
 		ifNotNil: [ :coverageTargetDirectory |
 			configuration coverageTargetDirectory: coverageTargetDirectory ]
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readJavaConfiguration [
 
 	configuration classpath: (self configurationAt: 'classpath').
-	configuration codeFormatter: (self loadAt: 'tests.codeFormatter').
+	configuration codeFormatter:
+		(self loadAt: 'tests.codeFormatter' required: false).
 	configuration refactorer: FASTRJava new
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readTestConfiguration [
 
 	configuration testExporter: ((self loadAt: 'tests.exporter')
@@ -449,13 +462,15 @@ ModestConfigurationReader >> readTestConfiguration [
 			 initializeWith: configuration valueImporter entityFinder)
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readTraceConfiguration [
 
 	configuration traceClassKey:
 		(self configurationAt: 'traces.classKey').
 	configuration traceMethodKey:
 		(self configurationAt: 'traces.methodKey').
+	configuration traceReceiverKey:
+		(self configurationAt: 'traces.receiverKey').
 	configuration traceArgumentsKey:
 		(self configurationAt: 'traces.argumentsKey').
 	configuration traceResultKey:
@@ -466,12 +481,12 @@ ModestConfigurationReader >> readTraceConfiguration [
 	"always use a distinct query"
 	configuration traceTransformers:
 		((self loadAt: 'traces.transformers' required: false)
-			 ifNil: [ { self newTraceDistinctQuery } ]
+			 ifNil: [ self newTraceTransformers ]
 			 ifNotNil: [ :transformers |
-			 transformers copyWith: self newTraceDistinctQuery ])
+			 self newTraceTransformers , transformers ])
 ]
 
-{ #category : #configuration }
+{ #category : 'configuration' }
 ModestConfigurationReader >> readValueConfiguration [
 
 	| entityFinder |
@@ -497,7 +512,7 @@ ModestConfigurationReader >> readValueConfiguration [
 					  yourself))
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ModestConfigurationReader >> registerSubclassesOf: aClass in: aRegistry [
 
 	| affixes prefix suffix |
@@ -515,7 +530,7 @@ ModestConfigurationReader >> registerSubclassesOf: aClass in: aRegistry [
 			aRegistry at: name asLowercase put: subclass ] ]
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 ModestConfigurationReader >> resolve: key in: dictionary ifAbsent: block [
 
 	| value |
@@ -527,7 +542,7 @@ ModestConfigurationReader >> resolve: key in: dictionary ifAbsent: block [
 	^ value
 ]
 
-{ #category : #updating }
+{ #category : 'updating' }
 ModestConfigurationReader >> updateSourceAnchors [
 	"Update all file source anchors in the model according to the configuration."
 
@@ -540,7 +555,7 @@ ModestConfigurationReader >> updateSourceAnchors [
 		self updateSourceAnchors: anchors with: newPath ]
 ]
 
-{ #category : #updating }
+{ #category : 'updating' }
 ModestConfigurationReader >> updateSourceAnchors: anchors with: newPath [
 	"Update all file source anchors of a common file, according to the configuration."
 
@@ -553,7 +568,9 @@ ModestConfigurationReader >> updateSourceAnchors: anchors with: newPath [
 	[ "cut down oldPath from the root and prefix newPath until it exists"
 	(prefixSize := oldPath indexOf: $/ startingAt: prefixSize + 1) = 0
 		ifTrue: [
-		ModestConfigurationSourceNotFound signalFor: anchors in: newPath ].
+			ModestConfigurationSourceNotFound
+				signalFor: anchors anyOne
+				in: newPath ].
 
 	(fileName := newPath , (oldPath allButFirst: prefixSize - 1))
 		asFileReference ifExists: [ :file |

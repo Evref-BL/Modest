@@ -2,12 +2,14 @@
 Thrown when a configuration item refers to a type that does not exist.
 "
 Class {
-	#name : #ModestConfigurationRegistryError,
-	#superclass : #ModestConfigurationError,
-	#category : #'Modest-Configuration'
+	#name : 'ModestConfigurationRegistryError',
+	#superclass : 'ModestConfigurationError',
+	#category : 'Modest-Configuration',
+	#package : 'Modest',
+	#tag : 'Configuration'
 }
 
-{ #category : #signalling }
+{ #category : 'signalling' }
 ModestConfigurationRegistryError class >> signalFor: key in: registry [
 
 	self new

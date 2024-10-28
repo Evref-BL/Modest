@@ -2,12 +2,14 @@
 Thrown when a configured directory that is required to exist is missing.
 "
 Class {
-	#name : #ModestConfigurationMissingDirectory,
-	#superclass : #ModestConfigurationError,
-	#category : #'Modest-Configuration'
+	#name : 'ModestConfigurationMissingDirectory',
+	#superclass : 'ModestConfigurationError',
+	#category : 'Modest-Configuration',
+	#package : 'Modest',
+	#tag : 'Configuration'
 }
 
-{ #category : #signalling }
+{ #category : 'signalling' }
 ModestConfigurationMissingDirectory class >> signalFor: directory path: path [
 
 	self new

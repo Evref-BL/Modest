@@ -6,8 +6,8 @@ This model is then exported into test suite ASTs, which can finally be exported 
 My subclasses must define the importers and exporters specific to the target language and libraries.
 "
 Class {
-	#name : #ModestTestGenerator,
-	#superclass : #Object,
+	#name : 'ModestTestGenerator',
+	#superclass : 'Object',
 	#instVars : [
 		'famixModel',
 		'traceModel',
@@ -17,23 +17,25 @@ Class {
 		'withSuiteOptimization',
 		'generatedContent'
 	],
-	#category : #'Modest-TestGenerator'
+	#category : 'Modest-TestGenerator',
+	#package : 'Modest',
+	#tag : 'TestGenerator'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 ModestTestGenerator class >> isAbstract [
 
 	^ self == ModestTestGenerator
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator class >> run [
 
 	<script>
 	^ self new runAsJob
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> buildUnitTests [
 
 	testModel := FamixUTImporter new fromOpenTelemetrySpans:
@@ -44,103 +46,100 @@ ModestTestGenerator >> buildUnitTests [
 		(testModel allWithType: FamixUTCase)
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> cleanUp [
 	"Clean up after the tests have been generated."
 
 	self tempDirectory deleteAll
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestTestGenerator >> codeFormatter [
 	"By default, do not format."
 
 	^ ModestNilFormatter new
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> exportAST [
 
 	self subclassResponsibility
 ]
 
-{ #category : #exporting }
+{ #category : 'exporting' }
 ModestTestGenerator >> exportJavaASTTo: exportDirectory [
 
 	generatedContent := (testASTModel allWithType:
-		                     FASTJavaCompilationUnit) collect: [ :ast |
-		                    | file contents |
-		                    file := (exportDirectory
-		                             /
-			                             (ast packageDeclaration qualifiedName
-				                              name copyReplaceAll: '.' with: '/')
-		                             / ast classDeclarations first name
-		                             , 'java') ensureDelete ensureCreateFile.
-		                    contents := FASTJavaExportVisitor new export:
-			                                ast.
-		                    file writeStreamDo: [ :stream |
-			                    stream nextPutAll: contents ].
-		                    file ].
+		                     FASTJavaCompilationUnit)
+		                    collect: [ :ast |
+			                    | file contents |
+			                    file := (exportDirectory
+			                             /
+				                             (ast packageDeclaration qualifiedName
+					                              name copyReplaceAll: '.' with: '/')
+			                             / ast classDeclarations first name
+			                             , 'java') ensureDelete
+				                            ensureCreateFile.
+			                    contents := FASTJavaExportVisitor new export:
+				                                ast.
+			                    file writeStreamDo: [ :stream |
+				                    stream nextPutAll: contents ].
+			                    file ]
+		                    as: Array.
 	self formatTestCode
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> exportUnitTests [
 	"Export the unit test model to AST."
 
 	self subclassResponsibility
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> formatTestCode [
 
 	self codeFormatter formatFiles: generatedContent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestTestGenerator >> generatedContent [
 
 	^ generatedContent
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> getCodebaseModel [
 
 	self subclassResponsibility
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> importTraceValues [
 
 	self subclassResponsibility
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> importTraces [
+	"Import the application traces into a model."
 
-self halt.
-
-	traceModel := FamixOTelValueModel new.
-	OpenTelemetryImporter new
-		extractor: self newTraceExtractor;
-		loader: (self newTraceLoader model: traceModel);
-		transformers: self newTraceTransformers;
-		import
+	self subclassResponsibility
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ModestTestGenerator >> initialize [
 
 	withSuiteOptimization := false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestTestGenerator >> localDirectory [
 
 	self subclassResponsibility
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> optimizeSuite [
 	"### Problem
 We generate a lot of tests from traces, but we don't know if all of them are relevant.
@@ -167,13 +166,13 @@ Scripts can be used to merge coverage data to create the combination coverage da
 	self subclassResponsibility
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> refactorAST [
 
 	self subclassResponsibility
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> run [
 	"Execute the whole unit test generation pipeline."
 
@@ -188,7 +187,7 @@ ModestTestGenerator >> run [
 	self cleanUp
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestTestGenerator >> runAsJob [
 
 	[ :mainJob |
@@ -236,7 +235,7 @@ ModestTestGenerator >> runAsJob [
 		run
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestTestGenerator >> tempDirectory [
 
 	^ (self localDirectory / 'temp') ensureCreateDirectory

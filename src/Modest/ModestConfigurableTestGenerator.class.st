@@ -1,13 +1,15 @@
 Class {
-	#name : #ModestConfigurableTestGenerator,
-	#superclass : #ModestTestGenerator,
+	#name : 'ModestConfigurableTestGenerator',
+	#superclass : 'ModestTestGenerator',
 	#instVars : [
 		'configuration'
 	],
-	#category : #'Modest-TestGenerator'
+	#category : 'Modest-TestGenerator',
+	#package : 'Modest',
+	#tag : 'TestGenerator'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 ModestConfigurableTestGenerator class >> runFrom: aConfigurationFile [
 
 	^ self new
@@ -17,7 +19,7 @@ ModestConfigurableTestGenerator class >> runFrom: aConfigurationFile [
 		  runAsJob
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestConfigurableTestGenerator class >> runWith: aConfiguration [
 
 	^ self new
@@ -25,26 +27,26 @@ ModestConfigurableTestGenerator class >> runWith: aConfiguration [
 		  runAsJob
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfigurableTestGenerator >> codeFormatter [
 
 	^ configuration codeFormatter ifNil: [ ModestNilFormatter new ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfigurableTestGenerator >> configuration [
 
 	^ configuration ifNil: [
 		  configuration := ModestConfigurationReader readConfiguration ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfigurableTestGenerator >> configuration: aConfiguration [
 
 	configuration := aConfiguration
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestConfigurableTestGenerator >> exportAST [
 
 	configuration language = 'java' ifTrue: [
@@ -54,13 +56,13 @@ ModestConfigurableTestGenerator >> exportAST [
 		, '` language is not (yet?) supported.'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestConfigurableTestGenerator >> exportUnitTests [
 
 	testASTModel := configuration testExporter export: testModel
 ]
 
-{ #category : #utilities }
+{ #category : 'utilities' }
 ModestConfigurableTestGenerator >> generateArchive [
 	"Make a zip archive of the generated tests."
 
@@ -77,25 +79,26 @@ ModestConfigurableTestGenerator >> generateArchive [
 	^ configuration localDirectory / zipName
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestConfigurableTestGenerator >> getCodebaseModel [
 
 	famixModel := configuration famixModel
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestConfigurableTestGenerator >> importTraceValues [
 
 	OTelFamixValueLinker new
 		importer: configuration valueImporter;
 		classKey: configuration traceClassKey;
 		methodKey: configuration traceMethodKey;
+		receiverKey: configuration traceReceiverKey;
 		argsKey: configuration traceArgumentsKey;
 		resultKey: configuration traceResultKey;
 		value: traceModel
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestConfigurableTestGenerator >> importTraces [
 
 	traceModel := FamixOTelValueModel new.
@@ -106,13 +109,13 @@ ModestConfigurableTestGenerator >> importTraces [
 		import
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestConfigurableTestGenerator >> localDirectory [
 
 	^ configuration localDirectory
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestConfigurableTestGenerator >> refactorAST [
 
 	configuration refactorer ifNotNil: [ :refactorer |

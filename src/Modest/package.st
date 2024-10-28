@@ -1,1 +1,1 @@
-Package { #name : #Modest }
+Package { #name : 'Modest' }

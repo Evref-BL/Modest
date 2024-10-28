@@ -1,67 +1,69 @@
 Class {
-	#name : #ModestHardCodedTestGenerator,
-	#superclass : #ModestTestGenerator,
+	#name : 'ModestHardCodedTestGenerator',
+	#superclass : 'ModestTestGenerator',
 	#instVars : [
 		'isLocal',
 		'localDirectory',
 		'sourceDirectory',
 		'codeFormatter'
 	],
-	#category : #'Modest-TestGenerator'
+	#category : 'Modest-TestGenerator',
+	#package : 'Modest',
+	#tag : 'TestGenerator'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 ModestHardCodedTestGenerator class >> isAbstract [
 
 	^ self == ModestHardCodedTestGenerator
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestHardCodedTestGenerator class >> runLocal [
 
 	<script>
 	^ self new beLocal runAsJob
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> beLocal [
 	"Whether to get traces locally, otherwise fetch them from a remote server."
 
 	isLocal := true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> beWithSuiteOptimization [
 	"Whether to run the test suite optimization step."
 
 	withSuiteOptimization := true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> codeFormatter [
 
 	^ codeFormatter ifNil: [ codeFormatter := ModestNilFormatter new ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> coverageDirectory [
 
 	^ (self tempDirectory / 'coverage') ensureCreateDirectory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> exportDirectory [
 
 	^ self sourceDirectory
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestHardCodedTestGenerator >> exportUnitTests [
 
 	testASTModel := self newUnitTestExporter export: testModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> famixModel [
 
 	^ famixModel ifNil: [
@@ -69,19 +71,19 @@ ModestHardCodedTestGenerator >> famixModel [
 			                model name = self famixModelName ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> famixModel: aFamixModel [
 
 	famixModel := aFamixModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> famixModelName [
 
 	self subclassResponsibility
 ]
 
-{ #category : #utilities }
+{ #category : 'utilities' }
 ModestHardCodedTestGenerator >> generateArchive [
 	"Make a zip archive of the generated tests."
 
@@ -96,7 +98,7 @@ ModestHardCodedTestGenerator >> generateArchive [
 	^ self localDirectory / zipName
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestHardCodedTestGenerator >> getCodebaseModel [
 	"Assume the model is already loaded in the image."
 
@@ -105,16 +107,15 @@ ModestHardCodedTestGenerator >> getCodebaseModel [
 	entityFinder := self newEntityFinder model: famixModel
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestHardCodedTestGenerator >> importTraceValues [
 	"Extract the values from the traces."
 
 	self newTraceValueLinker value: traceModel
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestHardCodedTestGenerator >> importTraces [
-	"Import the application traces into a model."
 
 	traceModel := FamixOTelValueModel new.
 	OpenTelemetryImporter new
@@ -124,40 +125,40 @@ ModestHardCodedTestGenerator >> importTraces [
 		import
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ModestHardCodedTestGenerator >> initialize [
 
 	super initialize.
 	isLocal := false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> libDirectory [
 
 	^ (self localDirectory / 'lib') ensureCreateDirectory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> localDirectory [
 
 	^ localDirectory ifNil: [
 		  localDirectory := 'pharo-local' asFileReference / 'modest' ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> localDirectory: aPath [
 
 	localDirectory := aPath asFileReference
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newASTRefactorer [
 	"Answer an object capable of doing AST refactorings, such as a subclass of FASTRefactor."
 
 	self subclassResponsibility
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newEntityFinder [
 	"Answer an object capable of finding application model elements.
 	It should be a FamixEntityFinder or a subclass."
@@ -165,7 +166,7 @@ ModestHardCodedTestGenerator >> newEntityFinder [
 	^ FamixEntityFinder new
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newTraceExtractor [
 
 	^ isLocal
@@ -174,7 +175,7 @@ ModestHardCodedTestGenerator >> newTraceExtractor [
 		  self newTraceRemoteExtractor outputFilename: self newTraceFilename ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newTraceFilename [
 
 	^ self tracesDirectory
@@ -182,7 +183,7 @@ ModestHardCodedTestGenerator >> newTraceFilename [
 		   , self famixModel name) , 'json'
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newTraceLoader [
 	"Answer an object capable of loading trace entities from raw trace data.
 	It should be a subclass of OTelAbstractLoader, such as OTelZipkinLoader."
@@ -190,7 +191,7 @@ ModestHardCodedTestGenerator >> newTraceLoader [
 	self subclassResponsibility
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newTraceLocalExtractor [
 	"Answer an object capable of extracting traces from a local source.
 	It should be a subclass of OTelAbstractExtractor, such as OTelJSONFileExtractor."
@@ -198,7 +199,7 @@ ModestHardCodedTestGenerator >> newTraceLocalExtractor [
 	self subclassResponsibility
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newTraceRemoteExtractor [
 	"Answer an object capable of extracting traces from a remote source.
 	It should be a subclass of OTelAbstractExtractor, such as OTelZipkinExtractor."
@@ -206,7 +207,7 @@ ModestHardCodedTestGenerator >> newTraceRemoteExtractor [
 	self subclassResponsibility
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newTraceTransformers [
 	"Answer a collection of objects capable of transforming trace entities.
 	They should be a subclass of OTelAbstractTransformer, such as OTelSpanTransformer."
@@ -214,21 +215,21 @@ ModestHardCodedTestGenerator >> newTraceTransformers [
 	self subclassResponsibility
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newTraceValueLinker [
 	"Return a configured OTelFamixValueLinker."
 
 	self subclassResponsibility
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ModestHardCodedTestGenerator >> newUnitTestExporter [
 	"Return a specific and configured subclass of FamixUTAbstractExporter."
 
 	self subclassResponsibility
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ModestHardCodedTestGenerator >> refactorAST [
 
 	[
@@ -240,7 +241,7 @@ ModestHardCodedTestGenerator >> refactorAST [
 		do: [ :e | self flag: #TODO. e resume ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> sourceDirectory [
 
 	^ sourceDirectory ifNil: [
@@ -248,43 +249,43 @@ ModestHardCodedTestGenerator >> sourceDirectory [
 			                     model rootFolder ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> testASTModel [
 
 	^ testASTModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> testASTModel: aFASTModel [
 
 	testASTModel := aFASTModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> testModel [
 
 	^ testModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> testModel: aFamixUTModel [
 
 	testModel := aFamixUTModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> traceModel [
 
 	^ traceModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> traceModel: aFamixOTModel [
 
 	traceModel := aFamixOTModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ModestHardCodedTestGenerator >> tracesDirectory [
 
 	^ (self localDirectory / 'traces') ensureCreateDirectory
