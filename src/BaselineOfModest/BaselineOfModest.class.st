@@ -1,10 +1,11 @@
 Class {
-	#name : #BaselineOfModest,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfModest
+	#name : 'BaselineOfModest',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfModest',
+	#package : 'BaselineOfModest'
 }
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfModest >> baseline: spec [
 
 	<baseline>
@@ -13,7 +14,7 @@ BaselineOfModest >> baseline: spec [
 		self packages: spec ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfModest >> dependencies: spec [
 
 	spec
@@ -27,10 +28,12 @@ BaselineOfModest >> dependencies: spec [
 		spec repository: 'github://moosetechnology/Famix-UnitTest:main/src' ];
 		baseline: 'FASTRefactor'
 		with: [
-		spec repository: 'github://moosetechnology/FASTRefactor:main/src' ]
+		spec repository: 'github://moosetechnology/FASTRefactor:main/src' ];
+		baseline: 'TinyLogger'
+		with: [ spec repository: 'github://jecisc/TinyLogger:v1.x.x/src' ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfModest >> packages: spec [
 
 	spec package: 'Modest'

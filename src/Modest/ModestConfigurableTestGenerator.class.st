@@ -16,7 +16,7 @@ ModestConfigurableTestGenerator class >> runFrom: aConfigurationFile [
 		  configuration:
 			  (ModestConfigurationReader readConfigurationFromFile:
 					   aConfigurationFile);
-		  runAsJob
+		  runWithLogging
 ]
 
 { #category : 'running' }
@@ -24,7 +24,14 @@ ModestConfigurableTestGenerator class >> runWith: aConfiguration [
 
 	^ self new
 		  configuration: aConfiguration;
-		  runAsJob
+		  runWithLogging
+]
+
+{ #category : 'utilities' }
+ModestConfigurableTestGenerator >> clearCaches [
+
+	configuration famixModel allTypes do: [ :type |
+		type entityCache empty ]
 ]
 
 { #category : 'accessing' }

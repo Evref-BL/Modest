@@ -32,7 +32,7 @@ ModestTestGenerator class >> isAbstract [
 ModestTestGenerator class >> run [
 
 	<script>
-	^ self new runAsJob
+	^ self new runWithLogging
 ]
 
 { #category : 'running' }
@@ -53,6 +53,15 @@ ModestTestGenerator >> cleanUp [
 	self tempDirectory deleteAll
 ]
 
+{ #category : 'utilities' }
+ModestTestGenerator >> clearCaches [
+	"Some properties for test generation are cached in the Famix entities.
+	Call this method to clear these caches.
+	This is only necessary if the computation for one of these properties has changed."
+
+	self subclassResponsibility
+]
+
 { #category : 'accessing' }
 ModestTestGenerator >> codeFormatter [
 	"By default, do not format."
@@ -69,23 +78,26 @@ ModestTestGenerator >> exportAST [
 { #category : 'exporting' }
 ModestTestGenerator >> exportJavaASTTo: exportDirectory [
 
-	generatedContent := (testASTModel allWithType:
-		                     FASTJavaCompilationUnit)
-		                    collect: [ :ast |
-			                    | file contents |
-			                    file := (exportDirectory
-			                             /
-				                             (ast packageDeclaration qualifiedName
-					                              name copyReplaceAll: '.' with: '/')
-			                             / ast classDeclarations first name
-			                             , 'java') ensureDelete
-				                            ensureCreateFile.
-			                    contents := FASTJavaExportVisitor new export:
-				                                ast.
-			                    file writeStreamDo: [ :stream |
-				                    stream nextPutAll: contents ].
-			                    file ]
-		                    as: Array.
+	| compilationUnits |
+	compilationUnits := testASTModel allWithType: FASTJavaCompilationUnit.
+	generatedContent := OrderedCollection new: compilationUnits size.
+
+	compilationUnits do: [ :ast |
+		| file contents |
+		ast classDeclarations
+			ifEmpty: [
+				Warning signal:
+					'Proceed to skip compilation unit without class declaration' ]
+			ifNotEmpty: [ :classDeclarations |
+				file := (exportDirectory
+				         / (ast packageDeclaration qualifiedName name
+						          copyReplaceAll: '.'
+						          with: '/') / classDeclarations first name , 'java')
+					        ensureDelete ensureCreateFile.
+				contents := FASTJavaExportVisitor new export: ast.
+				file writeStreamDo: [ :stream | stream nextPutAll: contents ].
+				generatedContent add: file ] ].
+
 	self formatTestCode
 ]
 
@@ -188,51 +200,44 @@ ModestTestGenerator >> run [
 ]
 
 { #category : 'running' }
-ModestTestGenerator >> runAsJob [
+ModestTestGenerator >> runWithLogging [
 
-	[ :mainJob |
-	[ :job |
-	job title: 'Getting codebase model...'.
+	TinyLogger default
+		ensureFileLoggerNamed: 'modest.log';
+		clearLog;
+		record: 'Running ' , self className.
+
+	'Getting codebase model...' record.
 	self getCodebaseModel.
-	mainJob increment.
 
-	job title: 'Importing traces...'.
+	'Importing traces...' record.
 	self importTraces.
-	mainJob increment.
 
-	job title: 'Importing trace values...'.
-	self importTraceValues.
-	mainJob increment.
+	self
+		execute: [ self importTraceValues ]
+		recordedAs: 'Importing trace values...'.
 
-	job title: 'Building unit test model...'.
+	'Building unit test model...' record.
 	self buildUnitTests.
-	mainJob increment.
 
-	job title: 'Building unit test AST...'.
-	self exportUnitTests.
-	mainJob increment.
+	self
+		execute: [ self exportUnitTests ]
+		recordedAs: 'Building unit test AST...'.
 
-	job title: 'Refactoring AST...'.
+	""'Refactoring AST...' record.
 	self refactorAST.
-	mainJob increment.
-
-	job title: 'Exporting tests...'.
+""
+	'Exporting tests...' record.
 	self exportAST.
-	mainJob increment.
 
 	withSuiteOptimization ifTrue: [
-			job title: 'Optimizing Suite...'.
-			self optimizeSuite.
-			mainJob increment ].
+		'Optimizing Suite...' record.
+		self optimizeSuite ].
 
-	job title: 'Cleaning up...'.
+	'Cleaning up...' record.
 	self cleanUp.
-	mainJob increment ] asJob run ] asJob
-		title: 'Running ' , self className;
-		max: (withSuiteOptimization
-				 ifTrue: [ 9 ]
-				 ifFalse: [ 8 ]);
-		run
+
+	'All done!' record
 ]
 
 { #category : 'accessing' }

@@ -55,7 +55,7 @@ ModestConfigurationReader class >> readConfigurationFromFile: aConfigurationFile
 { #category : 'enumerating' }
 ModestConfigurationReader >> configurationAt: key [
 
-	^ self configurationAt: key default: nil
+	^ self configurationAt: key required: true
 ]
 
 { #category : 'enumerating' }
@@ -74,6 +74,14 @@ ModestConfigurationReader >> configurationAt: key default: aBlockOrNil [
 		        ifAbsent: aBlockOrNil.
 	data ifNil: [ ModestConfigurationMissing signalFor: key ].
 	^ data
+]
+
+{ #category : 'accessing' }
+ModestConfigurationReader >> configurationAt: key required: isRequired [
+
+	^ self
+		  configurationAt: key
+		  default: (isRequired ifFalse: [ [ ^ nil ] ])
 ]
 
 { #category : 'enumerating' }
@@ -165,12 +173,9 @@ ModestConfigurationReader >> loadAt: key [
 { #category : 'enumerating' }
 ModestConfigurationReader >> loadAt: key required: isRequired [
 
-	^ self
-		  loadAt: key
-		  withConfiguration:
-		  (self
+	^ self loadAt: key withConfiguration: (self
 			   configurationAt: key
-			   default: [ isRequired ifFalse: [ ^ nil ] ])
+			   default: (isRequired ifFalse: [ [ ^ nil ] ]))
 ]
 
 { #category : 'enumerating' }
@@ -245,12 +250,14 @@ ModestConfigurationReader >> newTraceDistinctQuery [
 	^ OTelDistinctQuery selector: [ :span |
 		  | tags |
 		  tags := span tags.
-		  {
-			  (tags at: configuration traceClassKey).
-			  (tags at: configuration traceMethodKey).
-			  (tags at: configuration traceReceiverKey).
-			  (tags at: configuration traceArgumentsKey).
-			  (tags at: configuration traceResultKey) } hash ]
+		  ((tags
+			    at: configuration traceReceiverKey
+			    ifPresent: [ :receiver | { receiver } ]
+			    ifAbsent: [ {  } ]) , {
+			   (tags at: configuration traceClassKey).
+			   (tags at: configuration traceMethodKey).
+			   (tags at: configuration traceArgumentsKey).
+			   (tags at: configuration traceResultKey) }) hash ]
 ]
 
 { #category : 'instance creation' }
@@ -470,7 +477,7 @@ ModestConfigurationReader >> readTraceConfiguration [
 	configuration traceMethodKey:
 		(self configurationAt: 'traces.methodKey').
 	configuration traceReceiverKey:
-		(self configurationAt: 'traces.receiverKey').
+		(self configurationAt: 'traces.receiverKey' required: false).
 	configuration traceArgumentsKey:
 		(self configurationAt: 'traces.argumentsKey').
 	configuration traceResultKey:

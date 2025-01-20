@@ -22,7 +22,7 @@ ModestHardCodedTestGenerator class >> isAbstract [
 ModestHardCodedTestGenerator class >> runLocal [
 
 	<script>
-	^ self new beLocal runAsJob
+	^ self new beLocal runWithLogging
 ]
 
 { #category : 'accessing' }
@@ -37,6 +37,12 @@ ModestHardCodedTestGenerator >> beWithSuiteOptimization [
 	"Whether to run the test suite optimization step."
 
 	withSuiteOptimization := true
+]
+
+{ #category : 'utilities' }
+ModestHardCodedTestGenerator >> clearCaches [
+
+	famixModel allTypes do: [ :type | type entityCache empty ]
 ]
 
 { #category : 'accessing' }
