@@ -123,6 +123,13 @@ ModestConfigurableTestGenerator >> localDirectory [
 ]
 
 { #category : 'running' }
+ModestConfigurableTestGenerator >> reduceSuite [
+
+	configuration testSuiteReducer ifNotNil: [ :reducer |
+		reducer reduceTestSuiteFor: self ]
+]
+
+{ #category : 'running' }
 ModestConfigurableTestGenerator >> refactorAST [
 
 	configuration refactorer ifNotNil: [ :refactorer |
@@ -132,7 +139,9 @@ ModestConfigurableTestGenerator >> refactorAST [
 			inlineLiterals;
 			removeRedundantSetters ]
 			on: MessageNotUnderstood
-			do: [ :e |
-				self flag: #TODO.
+			do: [ :e | "Once upon a time (before 2024-05-13),
+				FAST(Java?) changed and things broke beyond my understanding.
+				But somehow, ignoring it seems to work regardless... (2025-05-28)"
+				self flag: #TODO. "investigate :)"
 				e resume ] ]
 ]

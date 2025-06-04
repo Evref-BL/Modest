@@ -13,8 +13,6 @@ Class {
 		'traceModel',
 		'testModel',
 		'testASTModel',
-		'entityFinder',
-		'withSuiteOptimization',
 		'generatedContent'
 	],
 	#category : 'Modest-TestGenerator',
@@ -69,6 +67,13 @@ ModestTestGenerator >> codeFormatter [
 	^ ModestNilFormatter new
 ]
 
+{ #category : 'accessing' }
+ModestTestGenerator >> configuration [
+	"Allows configuration to be hard-coded as methods in subclasses."
+
+	^ self
+]
+
 { #category : 'running' }
 ModestTestGenerator >> exportAST [
 
@@ -108,6 +113,18 @@ ModestTestGenerator >> exportUnitTests [
 	self subclassResponsibility
 ]
 
+{ #category : 'accessing' }
+ModestTestGenerator >> famixModel [
+
+	^ famixModel
+]
+
+{ #category : 'accessing' }
+ModestTestGenerator >> famixModel: aFamixModel [
+
+	famixModel := aFamixModel
+]
+
 { #category : 'running' }
 ModestTestGenerator >> formatTestCode [
 
@@ -139,12 +156,6 @@ ModestTestGenerator >> importTraces [
 	self subclassResponsibility
 ]
 
-{ #category : 'initialization' }
-ModestTestGenerator >> initialize [
-
-	withSuiteOptimization := false
-]
-
 { #category : 'accessing' }
 ModestTestGenerator >> localDirectory [
 
@@ -152,7 +163,7 @@ ModestTestGenerator >> localDirectory [
 ]
 
 { #category : 'running' }
-ModestTestGenerator >> optimizeSuite [
+ModestTestGenerator >> reduceSuite [
 	"### Problem
 We generate a lot of tests from traces, but we don't know if all of them are relevant.
 Multiple tests for the same method may have overlapping coverage, such as adding a user but with a different name.
@@ -195,14 +206,14 @@ ModestTestGenerator >> run [
 	self exportUnitTests.
 	self refactorAST.
 	self exportAST.
-	withSuiteOptimization ifTrue: [ self optimizeSuite ].
+	self reduceSuite.
 	self cleanUp
 ]
 
 { #category : 'running' }
 ModestTestGenerator >> runWithLogging [
 
-	TinyLogger default
+	TinyCurrentLogger value
 		ensureFileLoggerNamed: 'modest.log';
 		clearLog;
 		record: 'Running ' , self className.
@@ -224,15 +235,13 @@ ModestTestGenerator >> runWithLogging [
 		execute: [ self exportUnitTests ]
 		recordedAs: 'Building unit test AST...'.
 
-	""'Refactoring AST...' record.
+	'Refactoring AST...' record.
 	self refactorAST.
-""
+
 	'Exporting tests...' record.
 	self exportAST.
 
-	withSuiteOptimization ifTrue: [
-		'Optimizing Suite...' record.
-		self optimizeSuite ].
+	self execute: [ self reduceSuite ] recordedAs: 'Reducing Suite...'.
 
 	'Cleaning up...' record.
 	self cleanUp.
@@ -244,4 +253,40 @@ ModestTestGenerator >> runWithLogging [
 ModestTestGenerator >> tempDirectory [
 
 	^ (self localDirectory / 'temp') ensureCreateDirectory
+]
+
+{ #category : 'accessing' }
+ModestTestGenerator >> testASTModel [
+
+	^ testASTModel
+]
+
+{ #category : 'accessing' }
+ModestTestGenerator >> testASTModel: aFASTModel [
+
+	testASTModel := aFASTModel
+]
+
+{ #category : 'accessing' }
+ModestTestGenerator >> testModel [
+
+	^ testModel
+]
+
+{ #category : 'accessing' }
+ModestTestGenerator >> testModel: aFamixUTModel [
+
+	testModel := aFamixUTModel
+]
+
+{ #category : 'accessing' }
+ModestTestGenerator >> traceModel [
+
+	^ traceModel
+]
+
+{ #category : 'accessing' }
+ModestTestGenerator >> traceModel: aFamixOTModel [
+
+	traceModel := aFamixOTModel
 ]

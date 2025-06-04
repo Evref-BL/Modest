@@ -62,6 +62,7 @@ ModestEclipseJavaFormatter >> findConfigPathFrom: aFileToFormat [
 				path basename = 'org.eclipse.jdt.core.prefs' ifTrue: [
 					^ configPath := path pathString ] ] ] ].
 	(directory := directory parent) isRoot ] whileFalse.
+
 	ModestConfigurationError signal:
 		'Unable to locate Eclipse formatter configuration file, ensure the `configPath` is correct and try again.'
 ]

@@ -10,6 +10,7 @@ Class {
 		'name',
 		'language',
 		'famixModel',
+		'entityFinder',
 		'traceClassKey',
 		'traceMethodKey',
 		'traceReceiverKey',
@@ -25,7 +26,8 @@ Class {
 		'valueImporter',
 		'valueExporter',
 		'testExporter',
-		'refactorer'
+		'refactorer',
+		'testSuiteReducer'
 	],
 	#classVars : [
 		'Current'
@@ -65,6 +67,12 @@ ModestConfiguration >> codeFormatter: aFormatter [
 	additionalConfiguration at: 'codeFormatter' put: aFormatter
 ]
 
+{ #category : 'accessing - computed' }
+ModestConfiguration >> coverageDirectory [
+
+	^ self tempDirectory / 'coverage'
+]
+
 { #category : 'accessing - other properties' }
 ModestConfiguration >> coverageTargetDirectory [
 
@@ -77,6 +85,18 @@ ModestConfiguration >> coverageTargetDirectory [
 ModestConfiguration >> coverageTargetDirectory: aFile [
 
 	additionalConfiguration at: 'coverageTargetDirectory' put: aFile
+]
+
+{ #category : 'accessing' }
+ModestConfiguration >> entityFinder [
+
+	^ entityFinder
+]
+
+{ #category : 'accessing' }
+ModestConfiguration >> entityFinder: aFamixEntityFinder [
+
+	entityFinder := aFamixEntityFinder
 ]
 
 { #category : 'accessing' }
@@ -188,6 +208,18 @@ ModestConfiguration >> tempDirectory [
 	^ self localDirectory / 'temp'
 ]
 
+{ #category : 'accessing - other properties' }
+ModestConfiguration >> testDependencies [
+
+	^ additionalConfiguration at: 'testDependencies' ifAbsent: [ nil ]
+]
+
+{ #category : 'accessing - other properties' }
+ModestConfiguration >> testDependencies: aString [
+
+	additionalConfiguration at: 'testDependencies' put: aString
+]
+
 { #category : 'accessing' }
 ModestConfiguration >> testExporter [
 
@@ -198,6 +230,18 @@ ModestConfiguration >> testExporter [
 ModestConfiguration >> testExporter: anObject [
 
 	testExporter := anObject
+]
+
+{ #category : 'tests' }
+ModestConfiguration >> testSuiteReducer [
+
+	^ testSuiteReducer
+]
+
+{ #category : 'tests' }
+ModestConfiguration >> testSuiteReducer: aTestSuiteReducer [
+
+	testSuiteReducer := aTestSuiteReducer
 ]
 
 { #category : 'accessing' }

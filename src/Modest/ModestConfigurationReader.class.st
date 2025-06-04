@@ -160,8 +160,27 @@ ModestConfigurationReader >> initializeRegistry [
 				 at: 'methodSetUpStrategy'
 				 put: Dictionary new).
 	self
+		registerSubclassesOf: FamixUTAbstractPatch
+		in: (testRegistry at: 'exporter' at: 'patches' put: Dictionary new).
+	self
 		registerSubclassesOf: ModestAbstractFormatter
-		in: (testRegistry at: 'codeFormatter' put: Dictionary new)
+		in: (testRegistry at: 'codeFormatter' put: Dictionary new).
+	self
+		registerSubclassesOf: ModestAbstractSuiteReducer
+		in: (testRegistry at: 'suiteReducer' put: Dictionary new).
+	self
+		registerSubclassesOf: ModestAbstractTestRunner
+		in:
+		(testRegistry
+			 at: 'suiteReducer'
+			 at: 'testRunner'
+			 put: Dictionary new).
+	self
+		registerSubclassesOf: FamixUnitCoverageAbstractImporter
+		in: (testRegistry
+				 at: 'suiteReducer'
+				 at: 'coverageImporter'
+				 put: Dictionary new)
 ]
 
 { #category : 'enumerating' }
@@ -190,7 +209,8 @@ ModestConfigurationReader >> loadAt: key withConfiguration: config [
 			             ModestConfigurationRegistryError
 				             signalFor: subKey
 				             in: resolved ].
-	"resolves to a single item"
+
+	"Resolves to a single item"
 	config isDictionary ifTrue: [
 		^ self
 			  loadFrom: aRegistry
@@ -199,10 +219,12 @@ ModestConfigurationReader >> loadAt: key withConfiguration: config [
 					   ifAbsent: [
 					   ModestConfigurationMissing signalFor: key , '.@type' ])
 			  withConfiguration: config ].
-	"must resolve to a list of items"
+
+	"Must resolve to a list of items"
 	config isArray ifFalse: [
 		ModestConfigurationError signal:
 			'Expected a dictionary or an array at `' , key , '`' ].
+
 	^ config withIndexCollect: [ :itemConfig :index |
 		  self
 			  loadFrom: aRegistry
@@ -294,7 +316,7 @@ ModestConfigurationReader >> parseEvaluatedString: str [
 		  do: [ :error |
 			  ModestConfigurationError signal:
 				  'Error evaluating code string `' , str , '` resulting in: '
-				  , error messageText ]
+				  , error printString ]
 ]
 
 { #category : 'parsing' }
@@ -399,13 +421,14 @@ ModestConfigurationReader >> readBaseConfiguration [
 
 { #category : 'configuration' }
 ModestConfigurationReader >> readConfiguration [
+	"Order is important because of lookups, e.g. referencing the export directory."
 
 	self readBaseConfiguration.
 	self readDirectoryConfiguration.
+	self readAdditionalConfiguration.
 	self readTraceConfiguration.
 	self readValueConfiguration.
 	self readTestConfiguration.
-	self readAdditionalConfiguration.
 	^ configuration
 ]
 
@@ -456,9 +479,15 @@ ModestConfigurationReader >> readDirectoryConfiguration [
 ModestConfigurationReader >> readJavaConfiguration [
 
 	configuration classpath: (self configurationAt: 'classpath').
+
 	configuration codeFormatter:
 		(self loadAt: 'tests.codeFormatter' required: false).
-	configuration refactorer: FASTRJava new
+
+	configuration refactorer: FASTRJava new.
+
+	(self configurationAt: 'testDependencies' required: false) ifNotNil: [
+		:classpath | "For generated test dependencies, TODO compute it automatically based on exporters and strategies"
+		configuration testDependencies: classpath ]
 ]
 
 { #category : 'configuration' }
@@ -466,7 +495,10 @@ ModestConfigurationReader >> readTestConfiguration [
 
 	configuration testExporter: ((self loadAt: 'tests.exporter')
 			 valueExporter: configuration valueExporter;
-			 initializeWith: configuration valueImporter entityFinder)
+			 initializeWith: configuration entityFinder).
+
+	configuration testSuiteReducer:
+		(self loadAt: 'tests.suiteReducer' required: false)
 ]
 
 { #category : 'configuration' }
@@ -505,6 +537,8 @@ ModestConfigurationReader >> readValueConfiguration [
 				                 configurationAt: 'values.replacements'
 				                 default: [ Dictionary new ]).
 
+	configuration entityFinder: entityFinder.
+
 	configuration valueImporter:
 		((self loadAt: 'values.importer') entityFinder: entityFinder).
 
@@ -523,7 +557,7 @@ ModestConfigurationReader >> readValueConfiguration [
 ModestConfigurationReader >> registerSubclassesOf: aClass in: aRegistry [
 
 	| affixes prefix suffix |
-	affixes := aClass name findBetweenSubstrings: { 'Abstract' }.
+	affixes := aClass name findBetweenSubstrings: #( 'Abstract' ).
 	prefix := affixes first.
 	suffix := affixes last.
 	aClass allSubclassesDo: [ :subclass |

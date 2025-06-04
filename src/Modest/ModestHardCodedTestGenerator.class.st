@@ -5,7 +5,9 @@ Class {
 		'isLocal',
 		'localDirectory',
 		'sourceDirectory',
-		'codeFormatter'
+		'entityFinder',
+		'codeFormatter',
+		'withSuiteReduction'
 	],
 	#category : 'Modest-TestGenerator',
 	#package : 'Modest',
@@ -32,11 +34,11 @@ ModestHardCodedTestGenerator >> beLocal [
 	isLocal := true
 ]
 
-{ #category : 'accessing' }
-ModestHardCodedTestGenerator >> beWithSuiteOptimization [
+{ #category : 'initialization' }
+ModestHardCodedTestGenerator >> beWithSuiteReduction [
 	"Whether to run the test suite optimization step."
 
-	withSuiteOptimization := true
+	withSuiteReduction := true
 ]
 
 { #category : 'utilities' }
@@ -75,12 +77,6 @@ ModestHardCodedTestGenerator >> famixModel [
 	^ famixModel ifNil: [
 		  famixModel := MooseModel root detect: [ :model |
 			                model name = self famixModelName ] ]
-]
-
-{ #category : 'accessing' }
-ModestHardCodedTestGenerator >> famixModel: aFamixModel [
-
-	famixModel := aFamixModel
 ]
 
 { #category : 'accessing' }
@@ -135,6 +131,7 @@ ModestHardCodedTestGenerator >> importTraces [
 ModestHardCodedTestGenerator >> initialize [
 
 	super initialize.
+	withSuiteReduction := false.
 	isLocal := false
 ]
 
@@ -253,42 +250,6 @@ ModestHardCodedTestGenerator >> sourceDirectory [
 	^ sourceDirectory ifNil: [
 		  sourceDirectory := self famixModel ifNotNil: [ :model |
 			                     model rootFolder ] ]
-]
-
-{ #category : 'accessing' }
-ModestHardCodedTestGenerator >> testASTModel [
-
-	^ testASTModel
-]
-
-{ #category : 'accessing' }
-ModestHardCodedTestGenerator >> testASTModel: aFASTModel [
-
-	testASTModel := aFASTModel
-]
-
-{ #category : 'accessing' }
-ModestHardCodedTestGenerator >> testModel [
-
-	^ testModel
-]
-
-{ #category : 'accessing' }
-ModestHardCodedTestGenerator >> testModel: aFamixUTModel [
-
-	testModel := aFamixUTModel
-]
-
-{ #category : 'accessing' }
-ModestHardCodedTestGenerator >> traceModel [
-
-	^ traceModel
-]
-
-{ #category : 'accessing' }
-ModestHardCodedTestGenerator >> traceModel: aFamixOTModel [
-
-	traceModel := aFamixOTModel
 ]
 
 { #category : 'accessing' }
