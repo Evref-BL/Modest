@@ -80,32 +80,6 @@ ModestTestGenerator >> exportAST [
 	self subclassResponsibility
 ]
 
-{ #category : 'exporting' }
-ModestTestGenerator >> exportJavaASTTo: exportDirectory [
-
-	| compilationUnits |
-	compilationUnits := testASTModel allWithType: FASTJavaCompilationUnit.
-	generatedContent := OrderedCollection new: compilationUnits size.
-
-	compilationUnits do: [ :ast |
-		| file contents |
-		ast classDeclarations
-			ifEmpty: [
-				Warning signal:
-					'Proceed to skip compilation unit without class declaration' ]
-			ifNotEmpty: [ :classDeclarations |
-				file := (exportDirectory
-				         / (ast packageDeclaration qualifiedName name
-						          copyReplaceAll: '.'
-						          with: '/') / classDeclarations first name , 'java')
-					        ensureDelete ensureCreateFile.
-				contents := FASTJavaExportVisitor new export: ast.
-				file writeStreamDo: [ :stream | stream nextPutAll: contents ].
-				generatedContent add: file ] ].
-
-	self formatTestCode
-]
-
 { #category : 'running' }
 ModestTestGenerator >> exportUnitTests [
 	"Export the unit test model to AST."
