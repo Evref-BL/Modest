@@ -28,23 +28,30 @@ ModestCoverageSuiteReducer >> coverageImporter: aCoverageImporter [
 { #category : 'reducing' }
 ModestCoverageSuiteReducer >> getTestCoverageFor: aTestGenerator [
 
-	| coverageFiles |
-	coverageFiles := testRunner getTestCoverageFor: aTestGenerator.
+	| coverageFiles reports |
+	coverageFiles := testRunner runTestCoverageFor: aTestGenerator.
 
 	"Set up the coverage data importer to find the covered classes in the code model"
 	coverageImporter entityFinder:
 		aTestGenerator configuration entityFinder.
 
 	"Build a list of FamixUnitCoverageReports, one per test method"
-	^ (aTestGenerator testModel allWithType: FamixUTMethod)
-		  collect: [ :test |
-			  | coverageFile |
-			  coverageFile := coverageFiles at:
-				                  test testedMethod parentType typeContainer
-					                  mooseNameWithDots , '.' , test case name , '.'
-				                  , test name.
-			  coverageImporter importCoverage: coverageFile ofMethod: test ]
-		  as: OrderedCollection
+	reports := OrderedCollection new.
+	aTestGenerator testASTModel mapping do: [ :classData |
+		(classData at: #methods) do: [ :methodData |
+			| test qualifiedName |
+			test := methodData at: #model.
+			qualifiedName := test testedMethod parentType typeContainer
+				                 qualifierString , test case name , '.'
+			                 , test name.
+			coverageFiles
+				at: qualifiedName
+				ifPresent: [ :coverageFile |
+					reports add:
+						(coverageImporter importCoverage: coverageFile ofMethod: test) ]
+				ifAbsent: [
+				Warning signal: 'Missing coverage for ' , qualifiedName ] ] ].
+	^ reports
 ]
 
 { #category : 'logging' }
