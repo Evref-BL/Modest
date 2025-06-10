@@ -56,11 +56,13 @@ ModestConfigurableTestGenerator >> configuration: aConfiguration [
 { #category : 'running' }
 ModestConfigurableTestGenerator >> exportAST [
 
-	configuration language = 'java' ifTrue: [
-		^ self exportJavaASTTo: configuration exportDirectory ].
+	configuration codeExporter ifNotNil: [ :codeExporter |
+		generatedContent := codeExporter exportFor: self ]
+
+	"Is this optional?
 	ModestConfigurationError signal:
 		'Exporting AST for the `' , configuration language
-		, '` language is not (yet?) supported.'
+		, '` language is not (yet?) supported.'"
 ]
 
 { #category : 'running' }

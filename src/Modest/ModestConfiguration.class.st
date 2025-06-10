@@ -46,7 +46,7 @@ ModestConfiguration class >> current [
 { #category : 'accessing - other properties' }
 ModestConfiguration >> classpath [
 
-	^ additionalConfiguration at: 'classpath' ifAbsent: [ nil ]
+	^ additionalConfiguration at: 'classpath' ifAbsent: [  ]
 ]
 
 { #category : 'accessing - other properties' }
@@ -56,9 +56,21 @@ ModestConfiguration >> classpath: aString [
 ]
 
 { #category : 'accessing - other properties' }
+ModestConfiguration >> codeExporter [
+
+	^ additionalConfiguration at: 'codeExporter' ifAbsent: [  ]
+]
+
+{ #category : 'accessing - other properties' }
+ModestConfiguration >> codeExporter: aCodeExporter [
+
+	additionalConfiguration at: 'codeExporter' put: aCodeExporter
+]
+
+{ #category : 'accessing - other properties' }
 ModestConfiguration >> codeFormatter [
 
-	^ additionalConfiguration at: 'codeFormatter' ifAbsent: [ nil ]
+	^ additionalConfiguration at: 'codeFormatter' ifAbsent: [  ]
 ]
 
 { #category : 'accessing - other properties' }
@@ -78,7 +90,7 @@ ModestConfiguration >> coverageTargetDirectory [
 
 	^ additionalConfiguration
 		  at: 'coverageTargetDirectory'
-		  ifAbsent: [ nil ]
+		  ifAbsent: [  ]
 ]
 
 { #category : 'accessing - other properties' }
@@ -145,7 +157,7 @@ ModestConfiguration >> language: aString [
 { #category : 'accessing - other properties' }
 ModestConfiguration >> libDirectory [
 
-	^ additionalConfiguration at: 'libDirectory' ifAbsent: [ nil ]
+	^ additionalConfiguration at: 'libDirectory' ifAbsent: [  ]
 ]
 
 { #category : 'accessing - other properties' }
@@ -211,7 +223,7 @@ ModestConfiguration >> tempDirectory [
 { #category : 'accessing - other properties' }
 ModestConfiguration >> testDependencies [
 
-	^ additionalConfiguration at: 'testDependencies' ifAbsent: [ nil ]
+	^ additionalConfiguration at: 'testDependencies' ifAbsent: [  ]
 ]
 
 { #category : 'accessing - other properties' }

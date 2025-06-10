@@ -498,7 +498,11 @@ ModestConfigurationReader >> readTestConfiguration [
 			 initializeWith: configuration entityFinder).
 
 	configuration testSuiteReducer:
-		(self loadAt: 'tests.suiteReducer' required: false)
+		(self loadAt: 'tests.suiteReducer' required: false).
+
+	(ModestAbstractCodeExporter defaultFor: configuration language)
+		ifNotNil: [ :codeExporter |
+		configuration codeExporter: codeExporter ]
 ]
 
 { #category : 'configuration' }
