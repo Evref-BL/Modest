@@ -13,7 +13,7 @@ Class {
 ModestConfigurationMissingDirectory class >> signalFor: directory path: path [
 
 	self new
-		messageText: 'Unable to find ' , directory , ' at '
-			, path asFileReference absolutePath canonicalize pathString , '.';
+		messageText: 'Unable to find `' , directory , '` at "'
+			, path asFileReference absolutePath canonicalize pathString , '".';
 		signal
 ]
