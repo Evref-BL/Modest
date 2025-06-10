@@ -19,15 +19,9 @@ Class {
 	#tag : 'SuiteReduction'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'running' }
 ModestJavaTestRunner >> allowReflectionOn: stream [
 	"Go around stricter reflection rules in Java 16 and 17+"
-
-	"'jdk.compiler/com.sun.tools.javac.processing'
-	'jdk.compiler/com.sun.tools.javac.util'
-	'jdk.compiler/com.sun.tools.javac.tree'
-	'jdk.compiler/com.sun.tools.javac.code'
-	'jdk.compiler/com.sun.tools.javac.model'"
 
 	#( 'java.base/java.lang' 'java.base/java.lang.reflect'
 	   'java.base/java.util' 'java.base/sun.reflect' ) do: [ :entry |
@@ -46,18 +40,21 @@ ModestJavaTestRunner >> classpath: aString [
 	classpath := aString
 ]
 
-{ #category : 'as yet unclassified' }
-ModestJavaTestRunner >> commandToCompile: javaFiles to: targetDir [
+{ #category : 'running' }
+ModestJavaTestRunner >> commandToCompile: javaFiles [
+	"Using the javac command: https://docs.oracle.com/javase/8/docs/technotes/tools/unix/javac.html
+	Disable annotation processing with `-proc:none` because they can throw errors."
 
 	^ String streamContents: [ :stream |
-		  stream << 'javac -proc:none -d "' << targetDir pathString << '"'.
+		  stream << 'javac -proc:none -d "'
+		  << self buildDirectory pathString << '"'.
 		  classpath isEmptyOrNil ifFalse: [
 			  stream << ' -classpath "' << classpath << '"' ].
 		  javaFiles do: [ :file | stream << ' "' << file fullName << '"' ] ]
 ]
 
-{ #category : 'as yet unclassified' }
-ModestJavaTestRunner >> compile: sourceDir to: targetDir [
+{ #category : 'running' }
+ModestJavaTestRunner >> compile: sourceDir [
 	"Compile Java source files into class files"
 
 	| javaFiles javacCommand result |
@@ -70,13 +67,13 @@ ModestJavaTestRunner >> compile: sourceDir to: targetDir [
 	javaFiles ifEmpty: [ ^ self ].
 
 	"Build and run a javac command"
-	javacCommand := self commandToCompile: javaFiles to: targetDir.
+	javacCommand := self commandToCompile: javaFiles.
 	result := LibC runCommand: javacCommand.
 	result = 0 ifFalse: [ "Something went wrong, how to fix it?"
-		self halt ]
+		self shouldBeImplemented ]
 ]
 
-{ #category : 'enumerating' }
+{ #category : 'running' }
 ModestJavaTestRunner >> findRunnerJarIn: directory [
 	"FileReference to the jar of the Java test runner.
 	Currently using a custom runner that uses JaCoCo and exports coverage data per test method.
@@ -88,13 +85,11 @@ ModestJavaTestRunner >> findRunnerJarIn: directory [
 				  'atomic-coverage-analyzer' ] ]
 ]
 
-{ #category : 'running' }
+{ #category : 'coverage' }
 ModestJavaTestRunner >> generateTestCoverageFor: aTestGenerator [
 	"Run AtomicCoverageAnalyzer and wait for the coverage data to be ready."
 
 	| jarPath command result |
-	self prepareToRunFor: aTestGenerator.
-
 	jarPath := (self findRunnerJarIn:
 		            aTestGenerator configuration libDirectory) pathString.
 
@@ -113,40 +108,24 @@ ModestJavaTestRunner >> generateTestCoverageFor: aTestGenerator [
 
 	result := LibC resultOfCommand: command.
 
-	result trimRight = 'ERROR' ifTrue: [ "What happened and how to fix it?"
+	(result beginsWith: 'ERROR') ifTrue: [ "What happened and how to fix it?"
 		self shouldBeImplemented ]
 ]
 
 { #category : 'running' }
-ModestJavaTestRunner >> getTestCoverageFor: aTestGenerator [
-
-	self generateTestCoverageFor: aTestGenerator.
-
-	"Map test method names to their coverage data file.
-	The goal is to not let clients depend on the .java file extension,
-	but instead rely on the properties of the involved test entities."
-	^ aTestGenerator configuration coverageDirectory children
-		  collect: [ :file | file basenameWithoutExtension -> file ]
-		  as: Dictionary
-]
-
-{ #category : 'as yet unclassified' }
 ModestJavaTestRunner >> prepareToRunFor: aTestGenerator [
 	"Compile the test sources, and add the test classes and their dependencies to the classpath."
 
-	| testClassesDir |
-	testClassesDir := (aTestGenerator configuration tempDirectory
-	                   / 'javaTestClasses') ensureCreateDirectory.
+	self buildDirectory:
+		aTestGenerator configuration coverageDirectory / 'target'.
 
 	classpath := String streamContents: [ :s | "Put newly generated tests first to avoid conflicts with existing tests if any"
-		             s nextPutAll: testClassesDir pathString.
+		             s nextPutAll: self buildDirectory pathString.
 		             s nextPut: DiskStore current separator.
 		             s nextPutAll:
 			             aTestGenerator configuration testDependencies.
 		             s nextPut: DiskStore current separator.
 		             s nextPutAll: aTestGenerator configuration classpath ].
 
-	self
-		compile: aTestGenerator configuration exportDirectory
-		to: testClassesDir
+	self compile: aTestGenerator configuration exportDirectory
 ]
