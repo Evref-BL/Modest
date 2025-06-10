@@ -455,7 +455,7 @@ ModestConfigurationReader >> readDirectoryConfiguration [
 
 	configuration sourceDirectory: (self
 			 existingDirectoryAt: 'sourceDirectory'
-			 default: [ configuration model rootFolder ]).
+			 default: [ configuration famixModel rootFolder ]).
 	self updateSourceAnchors.
 
 	configuration exportDirectory:
