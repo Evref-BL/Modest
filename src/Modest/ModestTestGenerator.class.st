@@ -179,9 +179,9 @@ ModestTestGenerator >> run [
 	self buildUnitTests.
 	self exportUnitTests.
 	self refactorAST.
+	[
 	self exportAST.
-	self reduceSuite.
-	self cleanUp
+	self reduceSuite ] ensure: [ self cleanUp ]
 ]
 
 { #category : 'running' }
@@ -192,33 +192,32 @@ ModestTestGenerator >> runWithLogging [
 		clearLog;
 		record: 'Running ' , self className.
 
-	'Getting codebase model...' record.
-	self getCodebaseModel.
+	self
+		execute: [ self getCodebaseModel ]
+		recordedAs: 'Getting codebase model...'.
 
-	'Importing traces...' record.
-	self importTraces.
+	self execute: [ self importTraces ] recordedAs: 'Importing traces...'.
 
 	self
 		execute: [ self importTraceValues ]
 		recordedAs: 'Importing trace values...'.
 
-	'Building unit test model...' record.
-	self buildUnitTests.
+	self
+		execute: [ self buildUnitTests ]
+		recordedAs: 'Building unit test model...'.
 
 	self
 		execute: [ self exportUnitTests ]
 		recordedAs: 'Building unit test AST...'.
 
-	'Refactoring AST...' record.
-	self refactorAST.
+	self execute: [ self refactorAST ] recordedAs: 'Refactoring AST...'.
 
-	'Exporting tests...' record.
-	self exportAST.
+	[
+	self execute: [ self exportAST ] recordedAs: 'Exporting tests...'.
 
-	self execute: [ self reduceSuite ] recordedAs: 'Reducing Suite...'.
-
-	'Cleaning up...' record.
-	self cleanUp.
+	self execute: [ self reduceSuite ] recordedAs: 'Reducing Suite...' ]
+		ensure: [
+		self execute: [ self cleanUp ] recordedAs: 'Cleaning up...' ].
 
 	'All done!' record
 ]
