@@ -5,6 +5,12 @@ Class {
 	#package : 'Modest'
 }
 
+{ #category : 'testing' }
+ModestJavaCodeExporter class >> isDefaultFor: aLanguageName [
+
+	^ aLanguageName = 'java'
+]
+
 { #category : 'exporting' }
 ModestJavaCodeExporter >> exportFor: aTestGenerator [
 

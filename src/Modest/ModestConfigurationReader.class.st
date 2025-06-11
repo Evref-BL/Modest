@@ -27,8 +27,8 @@ ModestConfigurationReader class >> findConfigurationFile [
 		   ifEmpty: [
 			   OSEnvironment current
 				   at: 'MODEST_CONFIGURATION'
-				   ifAbsent: [ "default location"
-					   ('pharo-local' asFileReference / 'modest') children
+				   ifAbsent: [ "Default location"
+					   (Smalltalk imageDirectory / 'pharo-local/modest') children
 						   detect: [ :file | file basename asLowercase = 'modest.json' ]
 						   ifNone: [ ModestConfigurationMissing signal ] ] ])
 		  asFileReference ifAbsent: [ ModestConfigurationMissing signal ]
@@ -190,6 +190,15 @@ ModestConfigurationReader >> loadAt: key [
 ]
 
 { #category : 'enumerating' }
+ModestConfigurationReader >> loadAt: key default: aBlockOrNil [
+
+	^ self
+		  loadAt: key
+		  withConfiguration:
+		  (self configurationAt: key default: [ ^ aBlockOrNil value ])
+]
+
+{ #category : 'enumerating' }
 ModestConfigurationReader >> loadAt: key required: isRequired [
 
 	^ self loadAt: key withConfiguration: (self
@@ -244,7 +253,7 @@ ModestConfigurationReader >> loadFrom: aRegistry at: key withConfiguration: aCon
 			             signalFor: key asLowercase
 			             in: aRegistry ]) new.
 	aConfiguration keysAndValuesDo: [ :field :value |
-		field = '@type' ifFalse: [ "load objects, can be of another type from a subregistry"
+		field = '@type' ifFalse: [ "Load objects, can be of another type from a subregistry"
 			instance perform: field asSymbol asMutator with: (self
 					 loadFrom: (aRegistry at: field ifAbsent: [ aRegistry ])
 					 parseValue: value) ] ].
@@ -258,8 +267,8 @@ ModestConfigurationReader >> loadFrom: aRegistry parseValue: value [
 		^ value collect: [ :elem |
 			  self loadFrom: aRegistry parseValue: elem ] ].
 	^ (value isDictionary and: [ value includesKey: '@type' ])
-		  ifFalse: [ "regular value" self parseValue: value ]
-		  ifTrue: [ "instantiate another type"
+		  ifFalse: [ "Regular value" self parseValue: value ]
+		  ifTrue: [ "Instantiate another type"
 			  self
 				  loadFrom: aRegistry
 				  at: (value at: '@type')
@@ -298,10 +307,10 @@ ModestConfigurationReader >> optionalDirectoryAt: key default: aBlockOrNil [
 				  ifExists: [ :dir | dir asAbsolute canonicalize ]
 				  ifAbsent: [
 				  ModestConfigurationMissingDirectory signalFor: key path: path ] ]
-		  ifAbsent: [ "missing configuration, no problem"
+		  ifAbsent: [ "Missing configuration, no problem"
 			  aBlockOrNil value ifNotNil: [ :directory |
 				  directory
-					  ifExists: [ "register in rawConfig to allow references"
+					  ifExists: [ "Register in rawConfig to allow references"
 						  rawConfiguration
 							  at: key
 							  put: directory absolutePath canonicalize pathString ]
@@ -380,8 +389,7 @@ ModestConfigurationReader >> parseValue: value [
 			  collect: [ :assoc |
 				  (self parseValue: assoc key) -> (self parseValue: assoc value) ]
 			  as: Dictionary ].
-	"number or boolean or nil"
-	^ value
+	^ value "Number or boolean or nil"
 ]
 
 { #category : 'parsing' }
@@ -461,7 +469,7 @@ ModestConfigurationReader >> readDirectoryConfiguration [
 	configuration exportDirectory:
 		(self configurationAt: 'exportDirectory') asFileReference.
 
-	"additional directories"
+	"Additional directories"
 	configuration tracesDirectory: (self
 			 optionalDirectoryAt: 'tracesDirectory'
 			 default: [
@@ -497,12 +505,15 @@ ModestConfigurationReader >> readTestConfiguration [
 			 valueExporter: configuration valueExporter;
 			 initializeWith: configuration entityFinder).
 
-	configuration testSuiteReducer:
-		(self loadAt: 'tests.suiteReducer' required: false).
-
-	(ModestAbstractCodeExporter defaultFor: configuration language)
+	(self
+		 loadAt: 'tests.codeExporter'
+		 default: [
+		 ModestAbstractCodeExporter defaultFor: configuration language ])
 		ifNotNil: [ :codeExporter |
-		configuration codeExporter: codeExporter ]
+		configuration codeExporter: codeExporter ].
+
+	configuration testSuiteReducer:
+		(self loadAt: 'tests.suiteReducer' required: false)
 ]
 
 { #category : 'configuration' }
