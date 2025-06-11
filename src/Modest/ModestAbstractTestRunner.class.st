@@ -28,6 +28,18 @@ ModestAbstractTestRunner >> buildDirectory: aDirectory [
 ]
 
 { #category : 'coverage' }
+ModestAbstractTestRunner >> collectCoverage [
+	"Map test method names to their coverage data.
+	The goal is to prevent clients from relying on file extensions.
+	Instead, they should rely on the properties of the involved test entities.
+	By default, assume the data is in files named after the qualified test name."
+
+	^ self buildDirectory files
+		  collect: [ :file | file basenameWithoutExtension -> file ]
+		  as: Dictionary
+]
+
+{ #category : 'coverage' }
 ModestAbstractTestRunner >> generateTestCoverageFor: aTestGenerator [
 	"Generate coverage data in the coverageDirectory of the generator."
 
@@ -46,11 +58,5 @@ ModestAbstractTestRunner >> runTestCoverageFor: aTestGenerator [
 
 	self prepareToRunFor: aTestGenerator.
 	self generateTestCoverageFor: aTestGenerator.
-
-	"Map test method names to their coverage data file.
-	The goal is to not let clients depend on the .java file extension,
-	but instead rely on the properties of the involved test entities."
-	^ aTestGenerator configuration coverageDirectory files
-		  collect: [ :file | file basenameWithoutExtension -> file ]
-		  as: Dictionary
+	^ self collectCoverage
 ]

@@ -47,6 +47,12 @@ ModestSmalltalkCITestRunner >> actualRunnerClass [
 	^ runnerClass
 ]
 
+{ #category : 'accessing' }
+ModestSmalltalkCITestRunner >> ciDirectory [
+
+	^ self buildDirectory / 'ci'
+]
+
 { #category : 'coverage' }
 ModestSmalltalkCITestRunner >> generateCISpecFor: aTestGenerator [
 	"SmalltalkCI is configured using a so-called spec file in STON format.
@@ -57,9 +63,10 @@ ModestSmalltalkCITestRunner >> generateCISpecFor: aTestGenerator [
 	testClasses := (String new: 100) writeStream.
 	testedClasses := (String new: 100) writeStream.
 
-	aTestGenerator testASTModel mapping do: [ :classData |
+	aTestGenerator configuration testExporter mapping classesDo: [
+		:classMapping |
 		| testClass |
-		testClass := classData at: #model.
+		testClass := classMapping model.
 		testClasses << ' #' << testClass name.
 		testedClasses << ' #' << testClass testedClass name ].
 
@@ -94,7 +101,7 @@ ModestSmalltalkCITestRunner >> generateTestCoverageFor: aTestGenerator [
 	[
 	OSEnvironment current
 		at: 'SCIII_BUILD'
-		put: (self buildDirectory / 'ci') pathString.
+		put: self ciDirectory pathString.
 
 	"Read class comment for full explanation on getting atomic coverage"
 	EpMonitor disableDuring: [ "Maybe creating anonymous subclasses is triggering Epicea events?
@@ -118,7 +125,7 @@ ModestSmalltalkCITestRunner >> prepareToRunFor: aTestGenerator [
 { #category : 'coverage' }
 ModestSmalltalkCITestRunner >> specFile [
 
-	^ self buildDirectory / 'ci/.smalltalk.ston'
+	^ self ciDirectory / '.smalltalk.ston'
 ]
 
 { #category : 'coverage' }
@@ -126,7 +133,7 @@ ModestSmalltalkCITestRunner >> tonelRepositoryFor: aTestGenerator [
 	"Create a Tonel repository containing the tested classes."
 
 	| sourceDirectory |
-	sourceDirectory := self buildDirectory / 'ci/src'.
+	sourceDirectory := self ciDirectory / 'src'.
 
 	(sourceDirectory / IceRepositoryProperties propertiesFileName)
 		ensureCreateFile writeStreamDo: [ :ws |

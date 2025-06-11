@@ -24,8 +24,14 @@ ModestJavaTestRunner >> allowReflectionOn: stream [
 	"Go around stricter reflection rules in Java 16 and 17+"
 
 	#( 'java.base/java.lang' 'java.base/java.lang.reflect'
-	   'java.base/java.util' 'java.base/sun.reflect' ) do: [ :entry |
+	   'java.base/java.util' ) do: [ :entry |
 		stream << ' --add-opens ' << entry << '=ALL-UNNAMED' ]
+]
+
+{ #category : 'accessing' }
+ModestJavaTestRunner >> classesDirectory [
+
+	^ self targetDirectory / 'classes'
 ]
 
 { #category : 'accessing' }
@@ -40,6 +46,17 @@ ModestJavaTestRunner >> classpath: aString [
 	classpath := aString
 ]
 
+{ #category : 'coverage' }
+ModestJavaTestRunner >> collectCoverage [
+	"JaCoCo execution files must be interpreted as binary data."
+
+	^ self buildDirectory files
+		  collect: [ :file |
+			  file basenameWithoutExtension
+			  -> (file binaryReadStreamDo: [ :s | s upToEnd ]) ]
+		  as: Dictionary
+]
+
 { #category : 'running' }
 ModestJavaTestRunner >> commandToCompile: javaFiles [
 	"Using the javac command: https://docs.oracle.com/javase/8/docs/technotes/tools/unix/javac.html
@@ -47,7 +64,7 @@ ModestJavaTestRunner >> commandToCompile: javaFiles [
 
 	^ String streamContents: [ :stream |
 		  stream << 'javac -proc:none -d "'
-		  << self buildDirectory pathString << '"'.
+		  << self classesDirectory pathString << '"'.
 		  classpath isEmptyOrNil ifFalse: [
 			  stream << ' -classpath "' << classpath << '"' ].
 		  javaFiles do: [ :file | stream << ' "' << file fullName << '"' ] ]
@@ -80,9 +97,8 @@ ModestJavaTestRunner >> findRunnerJarIn: directory [
 	See: github.com/Evref-BL/AtomicCoverageAnalyzer-Java"
 
 	^ directory asFileReference children detect: [ :file |
-		  file extension = 'jar' and: [
-			  file basenameWithoutExtension beginsWith:
-				  'atomic-coverage-analyzer' ] ]
+		  (file basename endsWith: '.jar') and: [
+			  file basename beginsWith: 'atomic-coverage-analyzer' ] ]
 ]
 
 { #category : 'coverage' }
@@ -94,16 +110,14 @@ ModestJavaTestRunner >> generateTestCoverageFor: aTestGenerator [
 		            aTestGenerator configuration libDirectory) pathString.
 
 	command := String streamContents: [ :s |
-		           s << 'cd "'
-		           << aTestGenerator configuration tempDirectory pathString
+		           s << 'cd "' << self targetDirectory pathString
 		           << '" && java'.
 		           self allowReflectionOn: s.
 		           s << ' -classpath "' << jarPath
 		           << DiskStore current separator asString << self classpath
 		           << '" -javaagent:"' << jarPath
 		           << '" fr.evref.modest.AtomicCoverageAnalyzer "'
-		           <<
-		           aTestGenerator configuration coverageDirectory pathString
+		           << self buildDirectory pathString
 		           << '" fr.evref.modest.ModestSuite' ].
 
 	result := LibC resultOfCommand: command.
@@ -116,11 +130,10 @@ ModestJavaTestRunner >> generateTestCoverageFor: aTestGenerator [
 ModestJavaTestRunner >> prepareToRunFor: aTestGenerator [
 	"Compile the test sources, and add the test classes and their dependencies to the classpath."
 
-	self buildDirectory:
-		aTestGenerator configuration coverageDirectory / 'target'.
+	self buildDirectory: aTestGenerator configuration coverageDirectory.
 
 	classpath := String streamContents: [ :s | "Put newly generated tests first to avoid conflicts with existing tests if any"
-		             s nextPutAll: self buildDirectory pathString.
+		             s nextPutAll: self classesDirectory pathString.
 		             s nextPut: DiskStore current separator.
 		             s nextPutAll:
 			             aTestGenerator configuration testDependencies.
@@ -128,4 +141,10 @@ ModestJavaTestRunner >> prepareToRunFor: aTestGenerator [
 		             s nextPutAll: aTestGenerator configuration classpath ].
 
 	self compile: aTestGenerator configuration exportDirectory
+]
+
+{ #category : 'accessing' }
+ModestJavaTestRunner >> targetDirectory [
+
+	^ self buildDirectory / 'target'
 ]

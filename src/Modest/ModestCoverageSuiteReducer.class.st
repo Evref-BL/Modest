@@ -28,8 +28,8 @@ ModestCoverageSuiteReducer >> coverageImporter: aCoverageImporter [
 { #category : 'reducing' }
 ModestCoverageSuiteReducer >> getTestCoverageFor: aTestGenerator [
 
-	| coverageFiles reports |
-	coverageFiles := testRunner runTestCoverageFor: aTestGenerator.
+	| rawCoverages reports |
+	rawCoverages := testRunner runTestCoverageFor: aTestGenerator.
 
 	"Set up the coverage data importer to find the covered classes in the code model"
 	coverageImporter entityFinder:
@@ -37,46 +37,20 @@ ModestCoverageSuiteReducer >> getTestCoverageFor: aTestGenerator [
 
 	"Build a list of FamixUnitCoverageReports, one per test method"
 	reports := OrderedCollection new.
-	aTestGenerator testASTModel mapping do: [ :classData |
-		(classData at: #methods) do: [ :methodData |
+	aTestGenerator configuration testExporter mapping classesDo: [
+		:classMapping |
+		classMapping methods do: [ :methodMapping |
 			| test qualifiedName |
-			test := methodData at: #model.
-			qualifiedName := test testedMethod parentType typeContainer
-				                 qualifierString , test case name , '.'
-			                 , test name.
-			coverageFiles
+			test := methodMapping model.
+			qualifiedName := test fullyQualifiedName.
+			rawCoverages
 				at: qualifiedName
-				ifPresent: [ :coverageFile |
+				ifPresent: [ :rawCoverage |
 					reports add:
-						(coverageImporter importCoverage: coverageFile ofMethod: test) ]
+						(coverageImporter importCoverage: rawCoverage ofMethod: test) ]
 				ifAbsent: [
 				Warning signal: 'Missing coverage for ' , qualifiedName ] ] ].
 	^ reports
-]
-
-{ #category : 'logging' }
-ModestCoverageSuiteReducer >> logInitialTestsToRemove: testsToRemove [
-
-	(String streamContents: [ :s |
-		 s nextPutAll: 'Initial redundant tests to remove: '.
-		 testsToRemove ifEmpty: [ s nextPutAll: 'none' ] ifNotEmpty: [
-			 testsToRemove
-				 do: [ :test | test printOn: s ]
-				 separatedBy: [ s nextPutAll: ', ' ] ] ]) record
-]
-
-{ #category : 'logging' }
-ModestCoverageSuiteReducer >> logTestsToRemove: testsToRemove forMethod: testedMethod [
-
-	String streamContents: [ :s |
-		testedMethod printOn: s.
-		s nextPutAll: ': '.
-		testsToRemove
-			ifEmpty: [ s nextPutAll: 'no tests to remove' ]
-			ifNotEmpty: [
-				testsToRemove
-					do: [ :test | test printOn: s ]
-					separatedBy: [ s nextPutAll: ', ' ] ] ]
 ]
 
 { #category : 'reducing' }

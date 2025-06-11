@@ -18,10 +18,10 @@ ModestPharoImageCodeExporter >> compilationErrors [
 ]
 
 { #category : 'compiling' }
-ModestPharoImageCodeExporter >> compileMethod: methodData inClass: class usingMapping: classData [
+ModestPharoImageCodeExporter >> compileMethod: methodMapping inClass: class usingMapping: classMapping [
 
 	| methodAST helpers |
-	methodAST := methodData at: #ast.
+	methodAST := methodMapping ast.
 
 	[ class compile: methodAST formattedCode classified: 'tests' ]
 		on: self compilationErrors
@@ -32,10 +32,10 @@ ModestPharoImageCodeExporter >> compileMethod: methodData inClass: class usingMa
 				<< methodAST selector << '` because: ' << e asString ] ] record.
 
 			"Remove the method from the mapping, not yet installed on class"
-			^ (classData at: #methods) removeKey: methodAST selector ].
+			^ classMapping removeMethod: methodMapping ].
 
 	"Export helpers if there are any"
-	helpers := methodData at: #helpers ifAbsent: [ ^ self ].
+	helpers := methodMapping helpers ifNil: [ ^ self ].
 	helpers do: [ :helperAST |
 		[ class compile: helperAST formattedCode classified: 'tests' ]
 			on: self compilationErrors
@@ -46,10 +46,11 @@ ModestPharoImageCodeExporter >> compileMethod: methodData inClass: class usingMa
 					<< helperAST selector << '` because: ' << e asString ] ] record.
 
 				"Remove the test method and helpers from the class and mapping"
-				1 to: (helpers indexOf: helperAST) do: [ :helper | "TODO not always in same class as test class"
+				self shouldBeImplemented. "Iterate from first to current included"
+				1 to: (helpers indexOf: helperAST) do: [ :helper | "Always in same class as test?"
 					class removeSelector: helper selector ].
 				class removeSelector: methodAST selector.
-				^ (classData at: #methods) removeKey: methodAST selector ] ]
+				^ classMapping removeMethod: methodMapping ] ]
 ]
 
 { #category : 'compiling' }
@@ -80,20 +81,18 @@ ModestPharoImageCodeExporter >> exportMapping: mapping [
 
 	| exported |
 	exported := OrderedCollection new.
-	mapping do: [ :classData |
+	mapping do: [ :classMapping |
 		| class |
-		class := self overwriteTestClass: (classData at: #model).
+		class := self overwriteTestClass: classMapping model.
 
-		classData
-			at: #comment
-			ifPresent: [ :comment | class comment: comment ].
+		classMapping comment ifNotNil: [ :comment | class comment: comment ].
 
-		(classData at: #methods) do: [ :methodData |
-			exported add:
-				(self
-					 compileMethod: methodData
+		"Iterate over a copy so the mapping can be modified"
+		classMapping methods values do: [ :methodMapping |
+			exported add: (self
+					 compileMethod: methodMapping
 					 inClass: class
-					 usingMapping: classData) ] ].
+					 usingMapping: classMapping) ] ].
 	^ exported
 ]
 

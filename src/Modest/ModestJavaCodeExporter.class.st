@@ -15,7 +15,7 @@ ModestJavaCodeExporter class >> isDefaultFor: aLanguageName [
 ModestJavaCodeExporter >> exportFor: aTestGenerator [
 
 	| exportDirectory compilationUnits exported |
-	exportDirectory := aTestGenerator exportDirectory.
+	exportDirectory := aTestGenerator configuration exportDirectory.
 	compilationUnits := aTestGenerator testASTModel allWithType:
 		                    FASTJavaCompilationUnit.
 	exported := OrderedCollection new: compilationUnits size.
