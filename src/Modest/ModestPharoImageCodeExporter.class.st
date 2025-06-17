@@ -1,8 +1,9 @@
 Class {
 	#name : 'ModestPharoImageCodeExporter',
 	#superclass : 'ModestAbstractCodeExporter',
-	#category : 'Modest',
-	#package : 'Modest'
+	#category : 'Modest-CodeExporters',
+	#package : 'Modest',
+	#tag : 'CodeExporters'
 }
 
 { #category : 'testing' }

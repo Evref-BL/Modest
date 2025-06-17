@@ -1,8 +1,9 @@
 Class {
 	#name : 'ModestAbstractCodeExporter',
 	#superclass : 'Object',
-	#category : 'Modest',
-	#package : 'Modest'
+	#category : 'Modest-CodeExporters',
+	#package : 'Modest',
+	#tag : 'CodeExporters'
 }
 
 { #category : 'instance creation' }
