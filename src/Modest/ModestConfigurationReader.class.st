@@ -281,14 +281,14 @@ ModestConfigurationReader >> newTraceDistinctQuery [
 	^ OTelDistinctQuery selector: [ :span |
 		  | tags |
 		  tags := span tags.
-		  ((tags
-			    at: configuration traceReceiverKey
-			    ifPresent: [ :receiver | { receiver } ]
-			    ifAbsent: [ {  } ]) , {
-			   (tags at: configuration traceClassKey).
-			   (tags at: configuration traceMethodKey).
-			   (tags at: configuration traceArgumentsKey).
-			   (tags at: configuration traceResultKey) }) hash ]
+		  (tags
+			   at: configuration traceReceiverKey
+			   ifPresent: [ :receiver | { receiver } ]
+			   ifAbsent: [ {  } ]) , {
+			  (tags at: configuration traceClassKey).
+			  (tags at: configuration traceMethodKey).
+			  (tags at: configuration traceArgumentsKey).
+			  (tags at: configuration traceResultKey) } ]
 ]
 
 { #category : 'instance creation' }
