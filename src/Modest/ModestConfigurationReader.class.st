@@ -544,7 +544,8 @@ ModestConfigurationReader >> readTraceConfiguration [
 
 	configuration traceExtractor: (self loadAt: 'traces.extractor').
 	configuration traceLoader: (self loadAt: 'traces.loader').
-	"always use a distinct query"
+
+	"Always use a distinct query"
 	configuration traceTransformers:
 		((self loadAt: 'traces.transformers' required: false)
 			 ifNil: [ self newTraceTransformers ]
