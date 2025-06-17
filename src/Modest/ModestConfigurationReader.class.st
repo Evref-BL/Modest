@@ -294,7 +294,19 @@ ModestConfigurationReader >> newTraceDistinctQuery [
 { #category : 'instance creation' }
 ModestConfigurationReader >> newTraceTransformers [
 
-	^ { self newTraceDistinctQuery }
+	^ {
+		  [ :traceModel |
+		  [ 'Loaded ' , traceModel allSpans size asString , ' spans.' ]
+			  record.
+		  traceModel ].
+
+		  self newTraceDistinctQuery.
+
+		  [ :traceModel |
+		  [
+		  'Keeping ' , traceModel allSpans size asString , ' unique spans.' ]
+			  record.
+		  traceModel ] }
 ]
 
 { #category : 'enumerating' }
