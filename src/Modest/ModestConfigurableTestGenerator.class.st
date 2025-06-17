@@ -102,7 +102,7 @@ ModestConfigurableTestGenerator >> importTraceValues [
 		classKey: configuration traceClassKey;
 		methodKey: configuration traceMethodKey;
 		receiverKey: configuration traceReceiverKey;
-		argsKey: configuration traceArgumentsKey;
+		argumentsKey: configuration traceArgumentsKey;
 		resultKey: configuration traceResultKey;
 		value: traceModel
 ]
