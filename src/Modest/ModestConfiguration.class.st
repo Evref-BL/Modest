@@ -223,7 +223,7 @@ ModestConfiguration >> tempDirectory [
 { #category : 'accessing - other properties' }
 ModestConfiguration >> testDependencies [
 
-	^ additionalConfiguration at: 'testDependencies' ifAbsent: [  ]
+	^ additionalConfiguration at: 'testDependencies' ifAbsent: [ '' ]
 ]
 
 { #category : 'accessing - other properties' }
