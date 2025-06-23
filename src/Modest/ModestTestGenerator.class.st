@@ -37,11 +37,7 @@ ModestTestGenerator class >> run [
 ModestTestGenerator >> buildUnitTests [
 
 	testModel := FamixUTImporter new fromOpenTelemetrySpans:
-		             traceModel allSpans.
-
-	"Make a suite with all generated test cases"
-	(testModel newSuiteNamed: 'ModestSuite') cases:
-		(testModel allWithType: FamixUTCase)
+		             traceModel allSpans
 ]
 
 { #category : 'running' }
