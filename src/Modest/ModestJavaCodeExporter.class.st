@@ -22,7 +22,7 @@ ModestJavaCodeExporter >> exportFor: aTestGenerator [
 	exported := OrderedCollection new: compilationUnits size.
 
 	compilationUnits do: [ :ast |
-		| file contents |
+		| file |
 		ast classDeclarations
 			ifEmpty: [ "Unsure whether to allow this to happen or not.
 				Should the AST exporter ensure cleaning up empty compilation units?
@@ -36,8 +36,10 @@ ModestJavaCodeExporter >> exportFor: aTestGenerator [
 						          copyReplaceAll: '.'
 						          with: '/') / classDeclarations first name , 'java')
 					        ensureDelete ensureCreateFile.
-				contents := FASTJavaExportVisitor new export: ast.
-				file writeStreamDo: [ :stream | stream nextPutAll: contents ].
+				file writeStreamDo: [ :stream |
+					FASTJavaExportVisitor new
+						outputStream: stream;
+						accept: ast ].
 				exported add: file ] ].
 
 	aTestGenerator codeFormatter formatFiles: exported.
