@@ -87,7 +87,7 @@ ModestJavaTestRunner >> compile: sourceDir [
 	javacCommand := self commandToCompile: javaFiles.
 	result := LibC runCommand: javacCommand.
 	result = 0 ifFalse: [ "Something went wrong, how to fix it?"
-		self shouldBeImplemented ]
+		self error: 'Java compilation failed' ]
 ]
 
 { #category : 'running' }
