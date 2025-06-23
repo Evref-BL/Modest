@@ -127,7 +127,7 @@ ModestCoverageSuiteReducer >> reduceTestsForMethod: testedMethod usingReports: r
 	"Compute a redundancy-elimination (backward-elimination) reduction of all tests (FamixUTMethod)
 	that target the same testedMethod. Each report in `reports` is a FamixUnitCoverageReport,
 	whose #rootMethod is a FamixUTMethod, and whose #coverageData is a Dictionary
-	mapping each covered coveredClass -> a FamixUnitCoverageData
+	mapping each covered coveredClass to a FamixUnitCoverageData
 	(which knows its #probeCount and supports #probeAt: to check coverage at a local index).
 
 	At the end, `removedTests` will contain the list of all FamixUTMethod

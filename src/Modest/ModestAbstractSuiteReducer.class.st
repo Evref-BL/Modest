@@ -87,12 +87,17 @@ ModestAbstractSuiteReducer >> removeTests: testsToRemove for: aTestGenerator [
 ModestAbstractSuiteReducer >> removeTests: testsToRemove fromMapping: mapping [
 
 	testsToRemove do: [ :test |
-		| classMapping |
-		classMapping := mapping classNamed: test case name.
-		classMapping removeMethodNamed: test name.
+		| hadHelpers classMapping |
+		classMapping := mapping atClass: test case.
+		hadHelpers := (classMapping methods flatCollect: #helpers)
+			              isNotEmpty.
+
+		classMapping removeMethod: test.
 
 		"TODO Delete the helper class if it is empty.
 		Can that happen? That means a test with no helper won against one with some.
 		I suppose it can happen, but removing a class is not as easy as a method, wait till it happens."
-		self assert: classMapping methods isNotEmpty ]
+		hadHelpers ifTrue: [
+			self assert:
+				(classMapping methods flatCollect: #helpers) isNotEmpty ] ]
 ]

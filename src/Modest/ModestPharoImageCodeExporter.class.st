@@ -78,11 +78,11 @@ ModestPharoImageCodeExporter >> exportFor: aTestGenerator [
 ]
 
 { #category : 'exporting' }
-ModestPharoImageCodeExporter >> exportMapping: mapping [
+ModestPharoImageCodeExporter >> exportMapping: modelMapping [
 
 	| exported |
 	exported := OrderedCollection new.
-	mapping do: [ :classMapping |
+	modelMapping classesDo: [ :classMapping |
 		| class |
 		class := self overwriteTestClass: classMapping model.
 
